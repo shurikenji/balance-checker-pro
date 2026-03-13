@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #f3f6f9;
+        color: #17212b;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 28px;
+        background: #fff;
+        border-bottom: 1px solid #dde5ee;
+      }
+
+      nav {
+        display: flex;
+        gap: 16px;
+      }
+
+      nav a {
+        color: #175cd3;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      main {
+        padding: 28px;
+        display: grid;
+        gap: 24px;
+      }
+
+      .panel {
+        padding: 24px;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
+      }
+
+      .messages {
+        display: grid;
+        gap: 12px;
+      }
+
+      .message {
+        padding: 12px 14px;
+        border-radius: 12px;
+      }
+
+      .message.error {
+        background: #fff0f0;
+        color: #9a1c1c;
+      }
+
+      .message.success {
+        background: #eefbf3;
+        color: #17663a;
+      }
+
+      form.grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #c9d5e2;
+        border-radius: 10px;
+        box-sizing: border-box;
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+
+      .full {
+        grid-column: 1 / -1;
+      }
+
+      button {
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 10px;
+        background: #17212b;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      .secondary {
+        background: #175cd3;
+      }
+
+      .danger {
+        background: #b42318;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 14px 10px;
+        border-bottom: 1px solid #e3e9ef;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .status.active {
+        background: #eefbf3;
+        color: #17663a;
+      }
+
+      .status.disabled {
+        background: #fff0f0;
+        color: #9a1c1c;
+      }
+
+      .status.cooldown {
+        background: #fff8e8;
+        color: #8a5b00;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .meta {
+        color: #5a6a79;
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/nav', { adminUser }) %>
+
+    <main>
+      <% if (error || success) { %>
+      <section class="messages">
+        <% if (error) { %>
+        <div class="message error"><%= error %></div>
+        <% } %>
+        <% if (success) { %>
+        <div class="message success"><%= success %></div>
+        <% } %>
+      </section>
+      <% } %>
+
+      <section class="panel">
+        <h1 style="margin-top: 0">Add Proxy</h1>
+        <p class="meta" style="margin-bottom: 20px">
+          Add an OpenAI-compatible proxy endpoint. Connectivity test checks whether
+          the base URL is reachable over HTTP.
+        </p>
+
+        <form method="post" action="/admin/proxies" class="grid">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+          <div>
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" required />
+          </div>
+
+          <div>
+            <label for="base_url">Base URL</label>
+            <input id="base_url" name="base_url" type="url" placeholder="https://proxy.example.com" required />
+          </div>
+
+          <div>
+            <label for="timeout_ms">Timeout ms</label>
+            <input id="timeout_ms" name="timeout_ms" type="number" value="15000" min="1000" step="1000" required />
+          </div>
+
+          <div>
+            <label for="rate_multiplier">Rate multiplier</label>
+            <input id="rate_multiplier" name="rate_multiplier" type="number" value="1" min="0.01" step="0.01" required />
+          </div>
+
+          <div>
+            <label for="weight">Weight</label>
+            <input id="weight" name="weight" type="number" value="100" min="1" required />
+          </div>
+
+          <div>
+            <label for="priority">Priority</label>
+            <input id="priority" name="priority" type="number" value="100" min="1" required />
+          </div>
+
+          <div>
+            <label for="max_concurrency">Max concurrency</label>
+            <input id="max_concurrency" name="max_concurrency" type="number" value="1" min="1" required />
+          </div>
+
+          <div class="full">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes"></textarea>
+          </div>
+
+          <div class="full">
+            <button type="submit" class="secondary">Create Proxy</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h1 style="margin-top: 0">Proxy List</h1>
+        <p class="meta" style="margin-bottom: 20px">
+          Active and reachable proxies will be used later by the auto-router and
+          batch worker.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Config</th>
+              <th>Health</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!proxies.length) { %>
+            <tr>
+              <td colspan="4">No proxies yet.</td>
+            </tr>
+            <% } %>
+
+            <% proxies.forEach((proxy) => { %>
+            <tr>
+              <td>
+                <strong><%= proxy.name %></strong>
+                <div class="meta"><%= proxy.base_url %></div>
+                <div class="status <%= proxy.status %>"><%= proxy.status %></div>
+              </td>
+              <td class="meta">
+                rate multiplier: <%= Number(proxy.rate_multiplier || 1).toFixed(2) %><br />
+                priority: <%= proxy.priority %><br />
+                weight: <%= proxy.weight %><br />
+                timeout: <%= proxy.timeout_ms %> ms<br />
+                max concurrency: <%= proxy.max_concurrency %><br />
+                <% if (proxy.notes) { %>notes: <%= proxy.notes %><% } %>
+              </td>
+              <td class="meta">
+                success: <%= proxy.success_count %><br />
+                failure: <%= proxy.failure_count %><br />
+                consecutive failures: <%= proxy.consecutive_failures %><br />
+                avg latency: <%= Number(proxy.avg_latency_ms || 0).toFixed(0) %> ms<br />
+                last success: <%= proxy.last_success_at || 'n/a' %><br />
+                last failure: <%= proxy.last_failure_at || 'n/a' %><br />
+                last error: <%= proxy.last_error || 'n/a' %>
+              </td>
+              <td>
+                <div class="actions">
+                  <form method="get" action="/admin/proxies/<%= proxy.id %>/edit">
+                    <button type="submit">Edit</button>
+                  </form>
+
+                  <form method="post" action="/admin/proxies/<%= proxy.id %>/test">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <button type="submit" class="secondary">Test</button>
+                  </form>
+
+                  <form method="post" action="/admin/proxies/<%= proxy.id %>/toggle">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <input
+                      type="hidden"
+                      name="next_status"
+                      value="<%= proxy.status === 'disabled' ? 'active' : 'disabled' %>"
+                    />
+                    <button type="submit" class="<%= proxy.status === 'disabled' ? 'secondary' : 'danger' %>">
+                      <%= proxy.status === 'disabled' ? 'Enable' : 'Disable' %>
+                    </button>
+                  </form>
+
+                  <form method="post" action="/admin/proxies/<%= proxy.id %>/delete">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <button type="submit" class="danger">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

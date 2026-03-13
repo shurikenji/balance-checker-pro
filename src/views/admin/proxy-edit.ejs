@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #f3f6f9;
+        color: #17212b;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 28px;
+        background: #fff;
+        border-bottom: 1px solid #dde5ee;
+      }
+
+      nav {
+        display: flex;
+        gap: 16px;
+      }
+
+      nav a {
+        color: #175cd3;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      main {
+        padding: 28px;
+      }
+
+      .panel {
+        max-width: 880px;
+        padding: 24px;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
+      }
+
+      .message {
+        margin-bottom: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #fff0f0;
+        color: #9a1c1c;
+      }
+
+      form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #c9d5e2;
+        border-radius: 10px;
+        box-sizing: border-box;
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+
+      .full {
+        grid-column: 1 / -1;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        grid-column: 1 / -1;
+      }
+
+      button,
+      .link-btn {
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 10px;
+        background: #175cd3;
+        color: #fff;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .link-btn {
+        background: #17212b;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/nav', { adminUser }) %>
+
+    <main>
+      <section class="panel">
+        <h1 style="margin-top: 0">Edit Proxy</h1>
+        <p style="color: #5a6a79; line-height: 1.6">
+          Update the proxy configuration. Changes apply to future checks and batch jobs.
+        </p>
+
+        <% if (error) { %>
+        <div class="message"><%= error %></div>
+        <% } %>
+
+        <form method="post" action="/admin/proxies/<%= proxy.id %>/edit">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+          <div>
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" value="<%= proxy.name %>" required />
+          </div>
+
+          <div>
+            <label for="base_url">Base URL</label>
+            <input id="base_url" name="base_url" type="url" value="<%= proxy.base_url %>" required />
+          </div>
+
+          <div>
+            <label for="timeout_ms">Timeout ms</label>
+            <input id="timeout_ms" name="timeout_ms" type="number" min="1000" step="1000" value="<%= proxy.timeout_ms %>" required />
+          </div>
+
+          <div>
+            <label for="rate_multiplier">Rate multiplier</label>
+            <input id="rate_multiplier" name="rate_multiplier" type="number" min="0.01" step="0.01" value="<%= Number(proxy.rate_multiplier || 1).toFixed(2) %>" required />
+          </div>
+
+          <div>
+            <label for="weight">Weight</label>
+            <input id="weight" name="weight" type="number" min="1" value="<%= proxy.weight %>" required />
+          </div>
+
+          <div>
+            <label for="priority">Priority</label>
+            <input id="priority" name="priority" type="number" min="1" value="<%= proxy.priority %>" required />
+          </div>
+
+          <div>
+            <label for="max_concurrency">Max concurrency</label>
+            <input id="max_concurrency" name="max_concurrency" type="number" min="1" value="<%= proxy.max_concurrency %>" required />
+          </div>
+
+          <div class="full">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes"><%= proxy.notes || '' %></textarea>
+          </div>
+
+          <div class="actions">
+            <button type="submit">Save Changes</button>
+            <a class="link-btn" href="/admin/proxies">Back to Proxies</a>
+          </div>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

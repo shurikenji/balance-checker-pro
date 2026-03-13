@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #f3f6f9;
+        color: #17212b;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 28px;
+        background: #fff;
+        border-bottom: 1px solid #dde5ee;
+      }
+
+      nav {
+        display: flex;
+        gap: 16px;
+      }
+
+      nav a {
+        color: #175cd3;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      main {
+        padding: 28px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .stat-card {
+        padding: 20px;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
+      }
+
+      .stat-card strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 1.8rem;
+      }
+
+      .panel {
+        max-width: 900px;
+        padding: 24px;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+      }
+
+      p {
+        margin: 0;
+        color: #566574;
+        line-height: 1.6;
+      }
+
+      button {
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 10px;
+        background: #17212b;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      ul {
+        margin-top: 20px;
+        padding-left: 20px;
+        color: #344454;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/nav', { adminUser }) %>
+
+    <main>
+      <section class="stats">
+        <div class="stat-card">
+          <span>Total proxies</span>
+          <strong><%= proxySummary.total || 0 %></strong>
+        </div>
+        <div class="stat-card">
+          <span>Active proxies</span>
+          <strong><%= proxySummary.active || 0 %></strong>
+        </div>
+        <div class="stat-card">
+          <span>Disabled proxies</span>
+          <strong><%= proxySummary.disabled || 0 %></strong>
+        </div>
+        <div class="stat-card">
+          <span>Cooldown proxies</span>
+          <strong><%= proxySummary.cooldown || 0 %></strong>
+        </div>
+        <div class="stat-card">
+          <span>Total batch jobs</span>
+          <strong><%= batchSummary.total || 0 %></strong>
+        </div>
+        <div class="stat-card">
+          <span>Queued jobs</span>
+          <strong><%= batchSummary.queued || 0 %></strong>
+        </div>
+        <div class="stat-card">
+          <span>Running jobs</span>
+          <strong><%= batchSummary.running || 0 %></strong>
+        </div>
+        <div class="stat-card">
+          <span>Completed jobs</span>
+          <strong><%= batchSummary.completed || 0 %></strong>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h1>Admin Dashboard</h1>
+        <p>
+          Admin authentication, proxy management, and batch queue intake are
+          working. The next implementation steps are worker execution, single checks,
+          and detailed logs.
+        </p>
+
+        <ul>
+          <li>Proxy management module: available</li>
+          <li>Batch upload module: available</li>
+          <li>Check logs module: pending</li>
+          <li>System settings module: pending</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

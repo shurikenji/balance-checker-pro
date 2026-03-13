@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #f3f6f9;
+        color: #17212b;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 28px;
+        background: #fff;
+        border-bottom: 1px solid #dde5ee;
+      }
+
+      nav {
+        display: flex;
+        gap: 16px;
+      }
+
+      nav a {
+        color: #175cd3;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      main {
+        padding: 28px;
+        display: grid;
+        gap: 24px;
+      }
+
+      .panel {
+        padding: 24px;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
+      }
+
+      .messages {
+        display: grid;
+        gap: 12px;
+      }
+
+      .message {
+        padding: 12px 14px;
+        border-radius: 12px;
+      }
+
+      .message.error {
+        background: #fff0f0;
+        color: #9a1c1c;
+      }
+
+      .message.success {
+        background: #eefbf3;
+        color: #17663a;
+      }
+
+      form {
+        display: grid;
+        gap: 18px;
+      }
+
+      .setting {
+        padding: 18px;
+        border-radius: 16px;
+        background: #f8fafc;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 700;
+      }
+
+      .desc {
+        margin: 0 0 10px;
+        color: #5a6a79;
+        line-height: 1.5;
+      }
+
+      input {
+        width: 100%;
+        max-width: 280px;
+        padding: 12px 14px;
+        border: 1px solid #c9d5e2;
+        border-radius: 10px;
+        box-sizing: border-box;
+        font: inherit;
+      }
+
+      button {
+        width: fit-content;
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 10px;
+        background: #175cd3;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/nav', { adminUser }) %>
+
+    <main>
+      <% if (error || success) { %>
+      <section class="messages">
+        <% if (error) { %>
+        <div class="message error"><%= error %></div>
+        <% } %>
+        <% if (success) { %>
+        <div class="message success"><%= success %></div>
+        <% } %>
+      </section>
+      <% } %>
+
+      <section class="panel">
+        <h1 style="margin-top: 0">System Settings</h1>
+        <p style="color: #5a6a79; line-height: 1.6">
+          These values are used directly by batch worker scheduling, proxy cooldown logic,
+          and request handling. Changes apply to future requests immediately.
+        </p>
+
+        <form method="post" action="/admin/settings">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+          <% settings.forEach((setting) => { %>
+          <div class="setting">
+            <label for="<%= setting.key %>"><%= setting.label %></label>
+            <p class="desc"><%= setting.description %></p>
+            <input
+              id="<%= setting.key %>"
+              name="<%= setting.key %>"
+              type="<%= setting.inputType %>"
+              min="<%= setting.min %>"
+              step="<%= setting.step %>"
+              value="<%= setting.value %>"
+              required
+            />
+          </div>
+          <% }) %>
+
+          <button type="submit">Save Settings</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+[Unit]
+Description=Balance Checker Pro
+After=network.target
+
+[Service]
+Type=simple
+User=balancechecker
+Group=balancechecker
+WorkingDirectory=/opt/balance-checker-pro
+EnvironmentFile=/opt/balance-checker-pro/.env
+ExecStart=/usr/bin/node src/server.js
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

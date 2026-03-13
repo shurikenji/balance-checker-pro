@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top left, rgba(22, 92, 211, 0.14), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(31, 122, 90, 0.14), transparent 22%),
+          #f4f7fb;
+        font-family: Georgia, "Times New Roman", serif;
+        color: #16202a;
+      }
+
+      .wrap {
+        width: min(920px, calc(100vw - 32px));
+        margin: 48px auto;
+      }
+
+      .hero,
+      .panel,
+      .result,
+      .error {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(8px);
+        border-radius: 22px;
+        box-shadow: 0 18px 48px rgba(18, 31, 44, 0.1);
+      }
+
+      .hero {
+        padding: 28px 30px;
+        margin-bottom: 22px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        line-height: 1;
+      }
+
+      .sub {
+        max-width: 720px;
+        color: #4f6274;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      .panel {
+        padding: 28px 30px;
+      }
+
+      form {
+        display: grid;
+        gap: 18px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 1px solid #cdd9e5;
+        box-sizing: border-box;
+        font: inherit;
+        background: #fff;
+      }
+
+      button {
+        width: fit-content;
+        min-width: 180px;
+        padding: 14px 18px;
+        border: 0;
+        border-radius: 14px;
+        background: #165cd3;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .error {
+        margin-top: 18px;
+        padding: 16px 18px;
+        color: #a11d1d;
+      }
+
+      .result {
+        margin-top: 22px;
+        padding: 24px 26px;
+      }
+
+      .result-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: baseline;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #e9f8ef;
+        color: #17663a;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+      }
+
+      .stat {
+        padding: 18px;
+        border-radius: 16px;
+        background: #f8fafc;
+      }
+
+      .stat span {
+        display: block;
+        color: #5d6f80;
+        margin-bottom: 8px;
+      }
+
+      .stat strong {
+        font-size: 1.5rem;
+      }
+
+      .meta {
+        margin-top: 18px;
+        color: #566879;
+        line-height: 1.6;
+      }
+
+      a {
+        color: #165cd3;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="hero">
+        <h1>Check API Balance</h1>
+        <p class="sub">
+          Choose the correct server first, then check a single API key. This public
+          page does not auto-switch servers. Each request uses exactly the server
+          you selected.
+        </p>
+      </section>
+
+      <section class="panel">
+        <form method="post" action="/check">
+          <div>
+            <label for="proxy_id">Server</label>
+            <select id="proxy_id" name="proxy_id" required>
+              <option value="">Select server</option>
+              <% proxies.forEach((proxy) => { %>
+              <option value="<%= proxy.id %>" <%= form.proxyId === String(proxy.id) ? 'selected' : '' %>>
+                <%= proxy.name %>
+              </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div>
+            <label for="api_key">API Key</label>
+            <input
+              id="api_key"
+              name="api_key"
+              type="password"
+              placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
+              value="<%= form.apiKey %>"
+              autocomplete="off"
+              required
+            />
+          </div>
+
+          <button type="submit">Check Balance</button>
+        </form>
+
+        <% if (error) { %>
+        <div class="error"><%= error %></div>
+        <% } %>
+
+        <% if (result) { %>
+        <section class="result">
+          <div class="result-head">
+            <div>
+              <h2 style="margin: 0 0 10px"><%= result.proxy.name %></h2>
+              <span class="badge">Request completed</span>
+            </div>
+            <div class="meta" style="margin-top: 0">Latency: <strong><%= result.latencyMs %> ms</strong></div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <span>Balance</span>
+              <strong>$<%= result.data.balance_usd %></strong>
+            </div>
+            <div class="stat">
+              <span>Usage</span>
+              <strong>$<%= result.data.usage_usd %></strong>
+            </div>
+            <div class="stat">
+              <span>Limit</span>
+              <strong>$<%= result.data.limit_usd %></strong>
+            </div>
+          </div>
+
+          <div class="meta">
+            Payment method:
+            <strong><%= result.data.has_payment_method ? 'available' : 'not found' %></strong><br />
+            Rate multiplier:
+            <strong><%= Number(result.data.rate_multiplier || 1).toFixed(2) %></strong><br />
+            Check id: <strong>#<%= result.id %></strong>
+          </div>
+        </section>
+        <% } %>
+      </section>
+
+      <p style="margin-top: 16px; color: #5a6c7d">
+        Admin portal: <a href="/admin/login">/admin/login</a>
+      </p>
+    </div>
+  </body>
+</html>
