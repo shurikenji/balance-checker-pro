@@ -28,7 +28,7 @@
             A specific proxy/server must be selected for every batch.
           </p>
 
-          <form method="post" action="/admin/batches" enctype="multipart/form-data">
+          <form method="post" action="/admin/batches?_csrf=<%= encodeURIComponent(csrfToken) %>" enctype="multipart/form-data">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
 
             <div class="form-grid">
