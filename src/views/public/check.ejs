@@ -522,9 +522,18 @@
         font-size: 0.75rem;
       }
 
-      .footer a {
-        color: var(--color-accent);
+      .footer .contact-btn {
+        color: #ffffff !important;
+        font-weight: 500;
+      }
+
+      .footer p a {
+        color: #0d9488;
         text-decoration: none;
+      }
+
+      .footer p a:hover {
+        text-decoration: underline;
       }
 
       .input-error {
@@ -663,7 +672,6 @@
           </div>
           <h1>API Balance Checker</h1>
           <p class="subtitle">Check your API credits</p>
-          <p class="helper">Choose the exact server ID. The page uses the public JSON API directly.</p>
         </div>
 
         <form id="checkForm" class="form">
