@@ -11,6 +11,10 @@ const publicCheckRoutes = require('./modules/public-check/routes');
 
 const app = express();
 
+if (env.nodeEnv === 'production') {
+  app.set('trust proxy', 1);
+}
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -26,6 +30,7 @@ app.use(cookieParser());
 app.use(
   session({
     secret: env.sessionSecret,
+    proxy: env.nodeEnv === 'production',
     resave: false,
     saveUninitialized: false,
     cookie: {
