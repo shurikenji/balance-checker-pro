@@ -56,6 +56,8 @@
 - route `/check`
 - JSON API for curl at `/api/check`
 - server list endpoint at `/api/servers`
+- public API contract uses `server_id`
+- `/check` submits via `fetch('/api/check')`
 - explicit server selection required
 - single key check through selected proxy
 - single check logs stored in DB

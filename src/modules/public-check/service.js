@@ -15,53 +15,46 @@ function maskApiKey(apiKey) {
   return `${apiKey.slice(0, 5)}***${apiKey.slice(-4)}`;
 }
 
-function getSelectableProxies() {
+function getSelectableServers() {
   return listActiveProxies();
 }
 
-function getSelectableProxySummary() {
-  return getSelectableProxies().map((proxy) => ({
-    id: proxy.id,
-    name: proxy.name,
+function getSelectableServerSummary() {
+  return getSelectableServers().map((server) => ({
+    server_id: server.id,
+    name: server.name,
   }));
 }
 
-function resolveSelectableProxy(input = {}) {
-  const proxyId = normalizeProxyId(input.proxyId);
-  const serverName = String(input.server || '').trim().toLowerCase();
+function resolveSelectableServer(input = {}) {
+  const serverId = normalizeServerId(input.serverId);
 
-  if (proxyId) {
-    const proxy = getProxyById(proxyId);
-    return proxy && proxy.status === 'active' ? proxy : null;
-  }
-
-  if (!serverName) {
+  if (!serverId) {
     return null;
   }
 
-  return (
-    getSelectableProxies().find((proxy) => String(proxy.name || '').trim().toLowerCase() === serverName) || null
-  );
+  const server = getProxyById(serverId);
+  return server && server.status === 'active' ? server : null;
 }
 
-async function runSingleCheck({ apiKey, proxyId }) {
+async function runSingleCheck({ apiKey, serverId }) {
   if (!validateApiKey(apiKey)) {
     throw createUserError('Invalid API key format. Must start with sk-', 'invalid_api_key');
   }
 
-  const proxy = resolveSelectableProxy({ proxyId });
+  const server = resolveSelectableServer({ serverId });
 
-  if (!proxy || proxy.status !== 'active') {
+  if (!server || server.status !== 'active') {
     throw createUserError('Selected server is unavailable', 'invalid_proxy');
   }
 
   try {
-    const result = await fetchBillingData(proxy, apiKey, proxy.timeout_ms);
-    updateProxyStatsSuccess(proxy.id, result.latencyMs, 'Billing OK');
+    const result = await fetchBillingData(server, apiKey, server.timeout_ms);
+    updateProxyStatsSuccess(server.id, result.latencyMs, 'Billing OK');
 
     const singleCheckId = createSingleCheckLog({
       apiKeyMask: maskApiKey(apiKey),
-      proxyId: proxy.id,
+      proxyId: server.id,
       status: 'success',
       responseTimeMs: result.latencyMs,
       data: result.data,
@@ -69,16 +62,16 @@ async function runSingleCheck({ apiKey, proxyId }) {
 
     return {
       id: singleCheckId,
-      proxy,
+      server,
       latencyMs: result.latencyMs,
       data: result.data,
     };
   } catch (error) {
-    updateProxyStatsFailure(proxy.id, error.message);
+    updateProxyStatsFailure(server.id, error.message);
 
     createSingleCheckLog({
       apiKeyMask: maskApiKey(apiKey),
-      proxyId: proxy.id,
+      proxyId: server.id,
       status: 'failed',
       responseTimeMs: error.latencyMs || null,
       errorCode: error.code || 'check_failed',
@@ -132,14 +125,14 @@ function createUserError(message, code) {
   return error;
 }
 
-function normalizeProxyId(value) {
+function normalizeServerId(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
 module.exports = {
-  getSelectableProxySummary,
-  getSelectableProxies,
-  resolveSelectableProxy,
+  getSelectableServerSummary,
+  getSelectableServers,
+  resolveSelectableServer,
   runSingleCheck,
 };

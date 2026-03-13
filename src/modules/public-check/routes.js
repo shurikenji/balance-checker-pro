@@ -1,19 +1,13 @@
 const express = require('express');
 
-const { getSelectableProxies, getSelectableProxySummary, resolveSelectableProxy, runSingleCheck } = require('./service');
+const { getSelectableServers, getSelectableServerSummary, resolveSelectableServer, runSingleCheck } = require('./service');
 
 const router = express.Router();
 
-function renderCheckPage(res, payload = {}) {
+function renderCheckPage(res) {
   return res.render('public/check', {
     title: 'Check Balance',
-    proxies: getSelectableProxies(),
-    form: {
-      proxyId: payload.proxyId || '',
-      apiKey: payload.apiKey || '',
-    },
-    result: payload.result || null,
-    error: payload.error || '',
+    servers: getSelectableServers(),
   });
 }
 
@@ -22,14 +16,13 @@ router.get('/check', (req, res) => renderCheckPage(res));
 router.get('/api/servers', (req, res) => {
   return res.json({
     ok: true,
-    servers: getSelectableProxySummary(),
+    servers: getSelectableServerSummary(),
   });
 });
 
 router.post('/api/check', async (req, res) => {
   const apiKey = String(req.body.api_key || req.body.apiKey || '').trim();
-  const proxyId = String(req.body.proxy_id || req.body.proxyId || '').trim();
-  const server = String(req.body.server || '').trim();
+  const serverId = String(req.body.server_id || req.body.serverId || '').trim();
 
   if (!apiKey) {
     return res.status(400).json({
@@ -41,22 +34,19 @@ router.post('/api/check', async (req, res) => {
     });
   }
 
-  if (!proxyId && !server) {
+  if (!serverId) {
     return res.status(400).json({
       ok: false,
       error: {
         code: 'missing_server',
-        message: 'server or proxy_id is required',
+        message: 'server_id is required',
       },
     });
   }
 
-  const proxy = resolveSelectableProxy({
-    proxyId,
-    server,
-  });
+  const server = resolveSelectableServer({ serverId });
 
-  if (!proxy) {
+  if (!server) {
     return res.status(404).json({
       ok: false,
       error: {
@@ -69,15 +59,13 @@ router.post('/api/check', async (req, res) => {
   try {
     const result = await runSingleCheck({
       apiKey,
-      proxyId: proxy.id,
+      serverId: server.id,
     });
 
     return res.json({
       ok: true,
-      server: {
-        id: result.proxy.id,
-        name: result.proxy.name,
-      },
+      server_id: result.server.id,
+      server_name: result.server.name,
       latency_ms: result.latencyMs,
       limit_usd: result.data.limit_usd,
       usage_usd: result.data.usage_usd,
@@ -92,37 +80,6 @@ router.post('/api/check', async (req, res) => {
         code: error.code || 'check_failed',
         message: error.message || 'Failed to check balance',
       },
-    });
-  }
-});
-
-router.post('/check', async (req, res) => {
-  const proxyId = String(req.body.proxy_id || '').trim();
-  const apiKey = String(req.body.api_key || '').trim();
-
-  if (!proxyId) {
-    return renderCheckPage(res, {
-      proxyId,
-      apiKey,
-      error: 'Please choose a server',
-    });
-  }
-
-  try {
-    const result = await runSingleCheck({
-      apiKey,
-      proxyId: Number(proxyId),
-    });
-
-    return renderCheckPage(res, {
-      proxyId,
-      result,
-    });
-  } catch (error) {
-    return renderCheckPage(res, {
-      proxyId,
-      apiKey,
-      error: error.message,
     });
   }
 });

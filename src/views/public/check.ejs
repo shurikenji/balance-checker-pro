@@ -53,6 +53,12 @@
         padding: 28px 30px;
       }
 
+      .helper {
+        margin: 0 0 18px;
+        color: #5f7182;
+        line-height: 1.6;
+      }
+
       form {
         display: grid;
         gap: 18px;
@@ -88,15 +94,28 @@
         cursor: pointer;
       }
 
+      button[disabled] {
+        opacity: 0.72;
+        cursor: wait;
+      }
+
+      .loading {
+        margin-top: 18px;
+        color: #415364;
+        display: none;
+      }
+
       .error {
         margin-top: 18px;
         padding: 16px 18px;
         color: #a11d1d;
+        display: none;
       }
 
       .result {
         margin-top: 22px;
         padding: 24px 26px;
+        display: none;
       }
 
       .result-head {
@@ -141,14 +160,9 @@
       }
 
       .meta {
-        margin-top: 18px;
+        margin-top: 0;
         color: #566879;
         line-height: 1.6;
-      }
-
-      a {
-        color: #165cd3;
-        text-decoration: none;
       }
     </style>
   </head>
@@ -159,20 +173,23 @@
         <p class="sub">
           Choose the correct server first, then check a single API key. This public
           page does not auto-switch servers. Each request uses exactly the server
-          you selected.
+          ID you selected.
         </p>
       </section>
 
       <section class="panel">
-        <form method="post" action="/check">
+        <p class="helper">
+          This page submits to the JSON API directly. Select a server ID, enter the
+          API key, and the result will be rendered without reloading the page.
+        </p>
+
+        <form id="check-form">
           <div>
-            <label for="proxy_id">Server</label>
-            <select id="proxy_id" name="proxy_id" required>
+            <label for="server_id">Server ID</label>
+            <select id="server_id" name="server_id" required>
               <option value="">Select server</option>
-              <% proxies.forEach((proxy) => { %>
-              <option value="<%= proxy.id %>" <%= form.proxyId === String(proxy.id) ? 'selected' : '' %>>
-                <%= proxy.name %>
-              </option>
+              <% servers.forEach((server) => { %>
+              <option value="<%= server.id %>">#<%= server.id %> - <%= server.name %></option>
               <% }) %>
             </select>
           </div>
@@ -184,46 +201,128 @@
               name="api_key"
               type="password"
               placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
-              value="<%= form.apiKey %>"
               autocomplete="off"
               required
             />
           </div>
 
-          <button type="submit">Check Balance</button>
+          <button id="submit-button" type="submit">Check Balance</button>
         </form>
 
-        <% if (error) { %>
-        <div class="error"><%= error %></div>
-        <% } %>
+        <div id="loading" class="loading">Checking balance...</div>
+        <div id="error-box" class="error"></div>
 
-        <% if (result) { %>
-        <section class="result">
+        <section id="result-box" class="result">
           <div class="result-head">
             <div>
-              <h2 style="margin: 0 0 10px"><%= result.proxy.name %></h2>
+              <h2 id="result-server-name" style="margin: 0 0 10px"></h2>
               <span class="badge">Request completed</span>
             </div>
-            <div class="meta" style="margin-top: 0">Latency: <strong><%= result.latencyMs %> ms</strong></div>
+            <div class="meta">Latency: <strong id="result-latency"></strong></div>
           </div>
 
           <div class="stats">
             <div class="stat">
               <span>Balance</span>
-              <strong>$<%= result.data.balance_usd %></strong>
+              <strong id="result-balance"></strong>
             </div>
             <div class="stat">
               <span>Usage</span>
-              <strong>$<%= result.data.usage_usd %></strong>
+              <strong id="result-usage"></strong>
             </div>
             <div class="stat">
               <span>Limit</span>
-              <strong>$<%= result.data.limit_usd %></strong>
+              <strong id="result-limit"></strong>
             </div>
           </div>
         </section>
-        <% } %>
       </section>
     </div>
+
+    <script>
+      const form = document.getElementById('check-form');
+      const submitButton = document.getElementById('submit-button');
+      const loadingBox = document.getElementById('loading');
+      const errorBox = document.getElementById('error-box');
+      const resultBox = document.getElementById('result-box');
+      const resultServerName = document.getElementById('result-server-name');
+      const resultLatency = document.getElementById('result-latency');
+      const resultBalance = document.getElementById('result-balance');
+      const resultUsage = document.getElementById('result-usage');
+      const resultLimit = document.getElementById('result-limit');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const serverId = String(formData.get('server_id') || '').trim();
+        const apiKey = String(formData.get('api_key') || '').trim();
+
+        hideError();
+        hideResult();
+
+        if (!serverId) {
+          showError('Please choose a server ID');
+          return;
+        }
+
+        if (!apiKey) {
+          showError('Please enter an API key');
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          const response = await fetch('/api/check', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              server_id: Number(serverId),
+              api_key: apiKey,
+            }),
+          });
+
+          const payload = await response.json();
+
+          if (!response.ok || !payload.ok) {
+            throw new Error((payload && payload.error && payload.error.message) || 'Failed to check balance');
+          }
+
+          resultServerName.textContent = `#${payload.server_id} - ${payload.server_name}`;
+          resultLatency.textContent = `${payload.latency_ms} ms`;
+          resultBalance.textContent = `$${payload.balance_usd}`;
+          resultUsage.textContent = `$${payload.usage_usd}`;
+          resultLimit.textContent = `$${payload.limit_usd}`;
+          resultBox.style.display = 'block';
+        } catch (error) {
+          showError(error.message || 'Failed to check balance');
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      function setLoading(isLoading) {
+        submitButton.disabled = isLoading;
+        submitButton.textContent = isLoading ? 'Checking...' : 'Check Balance';
+        loadingBox.style.display = isLoading ? 'block' : 'none';
+      }
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.style.display = 'block';
+      }
+
+      function hideError() {
+        errorBox.textContent = '';
+        errorBox.style.display = 'none';
+      }
+
+      function hideResult() {
+        resultBox.style.display = 'none';
+      }
+    </script>
   </body>
 </html>

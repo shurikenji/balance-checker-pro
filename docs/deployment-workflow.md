@@ -212,6 +212,15 @@ Manual production checks:
 5. Open batch details.
 6. Export CSV.
 
+Public API smoke test:
+
+```bash
+curl https://your-domain.example.com/api/servers
+curl -X POST https://your-domain.example.com/api/check \
+  -H "Content-Type: application/json" \
+  -d '{"server_id":1,"api_key":"sk-your-key"}'
+```
+
 ## Daily Update Workflow
 
 This is the default update path after you change code on Windows.
