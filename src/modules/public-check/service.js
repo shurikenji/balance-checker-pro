@@ -1,6 +1,11 @@
 const { getDatabase } = require('../../db');
 const { fetchBillingData, validateApiKey } = require('../checks/service');
-const { getProxyById, listActiveProxies, updateProxyStatsFailure, updateProxyStatsSuccess } = require('../proxies/service');
+const {
+  getProxyById,
+  listActiveProxies,
+  updateProxyStatsFailure,
+  updateProxyStatsSuccess,
+} = require('../proxies/service');
 
 function maskApiKey(apiKey) {
   if (!apiKey || apiKey.length < 10) {
@@ -14,12 +19,37 @@ function getSelectableProxies() {
   return listActiveProxies();
 }
 
+function getSelectableProxySummary() {
+  return getSelectableProxies().map((proxy) => ({
+    id: proxy.id,
+    name: proxy.name,
+  }));
+}
+
+function resolveSelectableProxy(input = {}) {
+  const proxyId = normalizeProxyId(input.proxyId);
+  const serverName = String(input.server || '').trim().toLowerCase();
+
+  if (proxyId) {
+    const proxy = getProxyById(proxyId);
+    return proxy && proxy.status === 'active' ? proxy : null;
+  }
+
+  if (!serverName) {
+    return null;
+  }
+
+  return (
+    getSelectableProxies().find((proxy) => String(proxy.name || '').trim().toLowerCase() === serverName) || null
+  );
+}
+
 async function runSingleCheck({ apiKey, proxyId }) {
   if (!validateApiKey(apiKey)) {
     throw createUserError('Invalid API key format. Must start with sk-', 'invalid_api_key');
   }
 
-  const proxy = getProxyById(Number(proxyId));
+  const proxy = resolveSelectableProxy({ proxyId });
 
   if (!proxy || proxy.status !== 'active') {
     throw createUserError('Selected server is unavailable', 'invalid_proxy');
@@ -102,7 +132,14 @@ function createUserError(message, code) {
   return error;
 }
 
+function normalizeProxyId(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
 module.exports = {
+  getSelectableProxySummary,
   getSelectableProxies,
+  resolveSelectableProxy,
   runSingleCheck,
 };

@@ -54,6 +54,8 @@
 
 7. Public single-check page
 - route `/check`
+- JSON API for curl at `/api/check`
+- server list endpoint at `/api/servers`
 - explicit server selection required
 - single key check through selected proxy
 - single check logs stored in DB
