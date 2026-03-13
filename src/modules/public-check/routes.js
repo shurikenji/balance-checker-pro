@@ -11,7 +11,8 @@ function renderCheckPage(res) {
   });
 }
 
-router.get('/check', (req, res) => renderCheckPage(res));
+router.get('/check', (req, res) => res.redirect(301, '/check-balance'));
+router.get('/check-balance', (req, res) => renderCheckPage(res));
 
 router.get('/api/servers', (req, res) => {
   return res.json({

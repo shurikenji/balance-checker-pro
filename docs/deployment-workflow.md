@@ -198,7 +198,7 @@ curl https://your-domain.example.com/health
 Then verify in browser:
 
 - `/`
-- `/check`
+- `/check-balance`
 - `/admin/login`
 - `/admin/proxies`
 - `/admin/batches`
