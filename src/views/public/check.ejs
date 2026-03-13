@@ -3,188 +3,564 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
+    <title><%= title %> | Check Your OpenAI Credits</title>
+    <meta name="description" content="Check your OpenAI API balance and usage quickly and securely." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      body {
+      :root {
+        --color-dark: #222831;
+        --color-mid: #393e46;
+        --color-accent: #00adb5;
+        --color-light: #eeeeee;
+        --bg-page: #eeeeee;
+        --bg-card: rgba(57, 62, 70, 0.06);
+        --bg-card-hover: rgba(57, 62, 70, 0.09);
+        --bg-input: rgba(238, 238, 238, 0.95);
+        --bg-input-hover: rgba(255, 255, 255, 1);
+        --text-primary: #222831;
+        --text-secondary: rgba(34, 40, 49, 0.7);
+        --text-muted: rgba(34, 40, 49, 0.55);
+        --border-subtle: rgba(57, 62, 70, 0.12);
+        --border-input: rgba(57, 62, 70, 0.18);
+        --focus-ring: rgba(0, 173, 181, 0.25);
+        --error-bg: rgba(34, 40, 49, 0.06);
+        --error-border: rgba(34, 40, 49, 0.25);
+        --success-bg: rgba(0, 173, 181, 0.08);
+        --shadow-sm: 0 1px 2px rgba(34, 40, 49, 0.04);
+        --shadow-md: 0 4px 12px rgba(34, 40, 49, 0.06);
+        --shadow-lg: 0 8px 24px rgba(34, 40, 49, 0.08);
+        --shadow-focus: 0 0 0 3px var(--focus-ring);
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 16px;
+        --transition-fast: 0.15s ease;
+        --transition-base: 0.2s ease;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
         margin: 0;
+        padding: 0;
+      }
+
+      html {
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: linear-gradient(180deg, #eeeeee 0%, rgba(238, 238, 238, 0.95) 100%);
+        color: var(--text-primary);
         min-height: 100vh;
-        background:
-          radial-gradient(circle at top left, rgba(22, 92, 211, 0.14), transparent 28%),
-          radial-gradient(circle at bottom right, rgba(31, 122, 90, 0.14), transparent 22%),
-          #f4f7fb;
-        font-family: Georgia, "Times New Roman", serif;
-        color: #16202a;
+        line-height: 1.5;
+        overflow-x: hidden;
       }
 
-      .wrap {
-        width: min(920px, calc(100vw - 32px));
-        margin: 48px auto;
+      .background-effects {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
       }
 
-      .hero,
-      .panel,
-      .result,
-      .error {
-        background: rgba(255, 255, 255, 0.92);
-        backdrop-filter: blur(8px);
-        border-radius: 22px;
-        box-shadow: 0 18px 48px rgba(18, 31, 44, 0.1);
+      .orb {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(50px);
+        opacity: 0.24;
       }
 
-      .hero {
-        padding: 28px 30px;
-        margin-bottom: 22px;
+      .orb-1 {
+        width: 240px;
+        height: 240px;
+        top: 8%;
+        left: -60px;
+        background: rgba(0, 173, 181, 0.24);
+      }
+
+      .orb-2 {
+        width: 280px;
+        height: 280px;
+        right: -90px;
+        top: 18%;
+        background: rgba(57, 62, 70, 0.14);
+      }
+
+      .orb-3 {
+        width: 220px;
+        height: 220px;
+        bottom: -60px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 173, 181, 0.18);
+      }
+
+      .container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: var(--shadow-md);
+        transition: box-shadow var(--transition-base);
+      }
+
+      .card:hover {
+        box-shadow: var(--shadow-lg);
+      }
+
+      .card-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .logo {
+        display: inline-flex;
+        margin-bottom: 1rem;
+      }
+
+      .logo svg {
+        transition: transform var(--transition-base);
+      }
+
+      .logo:hover svg {
+        transform: scale(1.05);
       }
 
       h1 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 4vw, 3.2rem);
-        line-height: 1;
+        font-size: 1.625rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.375rem;
+        letter-spacing: -0.02em;
       }
 
-      .sub {
-        max-width: 720px;
-        color: #4f6274;
-        line-height: 1.6;
-        margin: 0;
-      }
-
-      .panel {
-        padding: 28px 30px;
+      .subtitle {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 400;
       }
 
       .helper {
-        margin: 0 0 18px;
-        color: #5f7182;
-        line-height: 1.6;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
       }
 
-      form {
-        display: grid;
-        gap: 18px;
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
       }
 
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 700;
-        font-size: 0.95rem;
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .input-group label {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        letter-spacing: 0.01em;
+      }
+
+      .input-wrapper {
+        position: relative;
+        display: flex;
       }
 
       input,
       select {
         width: 100%;
-        padding: 14px 16px;
-        border-radius: 14px;
-        border: 1px solid #cdd9e5;
-        box-sizing: border-box;
-        font: inherit;
-        background: #fff;
+        padding: 0.75rem 1rem;
+        background: var(--bg-input);
+        border: 1px solid var(--border-input);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.9375rem;
+        font-family: inherit;
+        transition:
+          border-color var(--transition-fast),
+          box-shadow var(--transition-fast),
+          background var(--transition-fast);
       }
 
-      button {
-        width: fit-content;
-        min-width: 180px;
-        padding: 14px 18px;
-        border: 0;
-        border-radius: 14px;
-        background: #165cd3;
-        color: #fff;
-        font-weight: 700;
+      input:hover,
+      select:hover {
+        background: var(--bg-input-hover);
+        border-color: rgba(57, 62, 70, 0.25);
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        background: var(--bg-input-hover);
+        border-color: var(--color-accent);
+        box-shadow: var(--shadow-focus);
+      }
+
+      input::placeholder {
+        color: var(--text-muted);
+      }
+
+      select {
         cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23393E46' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.875rem center;
+        padding-right: 2.5rem;
       }
 
-      button[disabled] {
-        opacity: 0.72;
-        cursor: wait;
+      .input-wrapper input {
+        padding-right: 2.75rem;
       }
 
-      .loading {
-        margin-top: 18px;
-        color: #415364;
+      .toggle-btn {
+        position: absolute;
+        right: 0.625rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 0.375rem;
+        border-radius: var(--radius-sm);
+        transition: color var(--transition-fast), background var(--transition-fast);
+      }
+
+      .toggle-btn:hover {
+        color: var(--text-primary);
+        background: rgba(57, 62, 70, 0.08);
+      }
+
+      .toggle-btn:focus {
+        outline: none;
+        box-shadow: var(--shadow-focus);
+      }
+
+      .btn-primary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        background: var(--color-accent);
+        border: none;
+        border-radius: var(--radius-md);
+        color: #ffffff;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition:
+          transform var(--transition-fast),
+          box-shadow var(--transition-fast),
+          background var(--transition-fast);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .btn-primary:hover {
+        background: #009aa1;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 173, 181, 0.25);
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .btn-primary:focus {
+        outline: none;
+        box-shadow: var(--shadow-focus), 0 4px 12px rgba(0, 173, 181, 0.2);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn-loader {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+
+      .btn-primary.loading .btn-text {
         display: none;
       }
 
-      .error {
-        margin-top: 18px;
-        padding: 16px 18px;
-        color: #a11d1d;
-        display: none;
+      .btn-primary.loading .btn-loader {
+        display: block;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
       }
 
       .result {
-        margin-top: 22px;
-        padding: 24px 26px;
+        margin-top: 1.75rem;
+        animation: fadeSlideUp 0.3s ease-out;
+      }
+
+      .hidden {
         display: none;
       }
 
-      .result-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 18px;
-        align-items: baseline;
-        flex-wrap: wrap;
+      @keyframes fadeSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
-      .badge {
-        display: inline-block;
-        padding: 6px 12px;
+      .result-header {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.875rem;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      .result-icon {
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .success-icon {
+        background: var(--success-bg);
+        color: var(--color-accent);
+      }
+
+      .result-server {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 0.875rem 0.75rem;
+        text-align: center;
+      }
+
+      .stat-label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.375rem;
+      }
+
+      .stat-value {
+        display: block;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .progress-bar {
+        flex: 1;
+        height: 8px;
+        background: rgba(57, 62, 70, 0.1);
         border-radius: 999px;
-        background: #e9f8ef;
-        color: #17663a;
-        font-size: 0.85rem;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--color-accent), #00c8d2);
+        border-radius: 999px;
+        transition: width 0.3s ease;
+      }
+
+      .progress-text {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        white-space: nowrap;
+      }
+
+      .error-box {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        margin-top: 1.25rem;
+        padding: 0.875rem 1rem;
+        background: var(--error-bg);
+        border: 1px solid var(--error-border);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+      }
+
+      .error-icon {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(34, 40, 49, 0.12);
+        font-size: 0.8125rem;
         font-weight: 700;
       }
 
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-        margin-top: 20px;
+      .error-message {
+        font-size: 0.875rem;
       }
 
-      .stat {
-        padding: 18px;
-        border-radius: 16px;
-        background: #f8fafc;
+      .footer {
+        margin-top: 1.5rem;
+        text-align: center;
       }
 
-      .stat span {
-        display: block;
-        color: #5d6f80;
-        margin-bottom: 8px;
+      .contact-links {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.625rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.75rem;
+        color: var(--text-secondary);
+        font-size: 0.8125rem;
       }
 
-      .stat strong {
-        font-size: 1.5rem;
+      .contact-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.4rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.8125rem;
+        text-decoration: none;
+        color: #ffffff;
       }
 
-      .meta {
-        margin-top: 0;
-        color: #566879;
-        line-height: 1.6;
+      .contact-btn.zalo {
+        background: #0068ff;
+      }
+
+      .contact-btn.telegram {
+        background: #229ed9;
+      }
+
+      .footer p {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+      }
+
+      .footer a {
+        color: var(--color-accent);
+        text-decoration: none;
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .card {
+          padding: 1.5rem;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .progress-container {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .progress-text {
+          text-align: right;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <section class="hero">
-        <h1>Check API Balance</h1>
-        <p class="sub">
-          Choose the correct server first, then check a single API key. This public
-          page does not auto-switch servers. Each request uses exactly the server
-          ID you selected.
-        </p>
-      </section>
+    <div class="background-effects">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
 
-      <section class="panel">
-        <p class="helper">
-          This page submits to the JSON API directly. Select a server ID, enter the
-          API key, and the result will be rendered without reloading the page.
-        </p>
+    <main class="container">
+      <div class="card">
+        <div class="card-header">
+          <div class="logo">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+              <circle cx="20" cy="20" r="18" stroke="#00ADB5" stroke-width="2" />
+              <path d="M20 10v20M10 20h20" stroke="#00ADB5" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </div>
+          <h1>API Balance Checker</h1>
+          <p class="subtitle">Check your API credits</p>
+          <p class="helper">Choose the exact server ID. The page uses the public JSON API directly.</p>
+        </div>
 
-        <form id="check-form">
-          <div>
+        <form id="checkForm" class="form">
+          <div class="input-group">
             <label for="server_id">Server ID</label>
             <select id="server_id" name="server_id" required>
               <option value="">Select server</option>
@@ -194,84 +570,111 @@
             </select>
           </div>
 
-          <div>
+          <div class="input-group">
             <label for="api_key">API Key</label>
-            <input
-              id="api_key"
-              name="api_key"
-              type="password"
-              placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
-              autocomplete="off"
-              required
-            />
+            <div class="input-wrapper">
+              <input
+                type="password"
+                id="api_key"
+                name="api_key"
+                placeholder="sk-xxxxxxxxxxxxxxxx"
+                autocomplete="off"
+                required
+              />
+              <button type="button" id="toggleKey" class="toggle-btn" aria-label="Toggle visibility">
+                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <button id="submit-button" type="submit">Check Balance</button>
+          <button type="submit" id="submitBtn" class="btn-primary">
+            <span class="btn-text">Check Balance</span>
+            <span class="btn-loader"></span>
+          </button>
         </form>
 
-        <div id="loading" class="loading">Checking balance...</div>
-        <div id="error-box" class="error"></div>
-
-        <section id="result-box" class="result">
-          <div class="result-head">
-            <div>
-              <h2 id="result-server-name" style="margin: 0 0 10px"></h2>
-              <span class="badge">Request completed</span>
-            </div>
-            <div class="meta">Latency: <strong id="result-latency"></strong></div>
+        <div id="result" class="result hidden">
+          <div class="result-header">
+            <span class="result-icon success-icon">✓</span>
+            <span class="result-server"></span>
           </div>
 
-          <div class="stats">
-            <div class="stat">
-              <span>Balance</span>
-              <strong id="result-balance"></strong>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Balance</span>
+              <span class="stat-value balance-value">$0.00</span>
             </div>
-            <div class="stat">
-              <span>Usage</span>
-              <strong id="result-usage"></strong>
+            <div class="stat-card">
+              <span class="stat-label">Used</span>
+              <span class="stat-value usage-value">$0.00</span>
             </div>
-            <div class="stat">
-              <span>Limit</span>
-              <strong id="result-limit"></strong>
+            <div class="stat-card">
+              <span class="stat-label">Limit</span>
+              <span class="stat-value limit-value">$0.00</span>
             </div>
           </div>
-        </section>
-      </section>
-    </div>
+
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+            <span class="progress-text">0% used</span>
+          </div>
+        </div>
+
+        <div id="error" class="error-box hidden">
+          <span class="error-icon">!</span>
+          <span class="error-message"></span>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="contact-links">
+          <span>Support:</span>
+          <a href="https://zalo.me/0867440698" target="_blank" rel="noreferrer" class="contact-btn zalo">Zalo</a>
+          <a href="https://t.me/zelyshopbot" target="_blank" rel="noreferrer" class="contact-btn telegram">Telegram Bot</a>
+        </div>
+        <p>Secure • No data stored • <a href="https://check.shupremium.com" target="_blank" rel="noreferrer">shupremium.com</a></p>
+      </footer>
+    </main>
 
     <script>
-      const form = document.getElementById('check-form');
-      const submitButton = document.getElementById('submit-button');
-      const loadingBox = document.getElementById('loading');
-      const errorBox = document.getElementById('error-box');
-      const resultBox = document.getElementById('result-box');
-      const resultServerName = document.getElementById('result-server-name');
-      const resultLatency = document.getElementById('result-latency');
-      const resultBalance = document.getElementById('result-balance');
-      const resultUsage = document.getElementById('result-usage');
-      const resultLimit = document.getElementById('result-limit');
+      const form = document.getElementById('checkForm');
+      const serverSelect = document.getElementById('server_id');
+      const apiKeyInput = document.getElementById('api_key');
+      const toggleBtn = document.getElementById('toggleKey');
+      const submitBtn = document.getElementById('submitBtn');
+      const resultBox = document.getElementById('result');
+      const errorBox = document.getElementById('error');
+
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = apiKeyInput.type === 'password';
+        apiKeyInput.type = isPassword ? 'text' : 'password';
+        toggleBtn.setAttribute('aria-label', isPassword ? 'Hide key' : 'Show key');
+      });
 
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        const formData = new FormData(form);
-        const serverId = String(formData.get('server_id') || '').trim();
-        const apiKey = String(formData.get('api_key') || '').trim();
-
-        hideError();
-        hideResult();
+        const apiKey = apiKeyInput.value.trim();
+        const serverId = serverSelect.value;
 
         if (!serverId) {
-          showError('Please choose a server ID');
+          showError('Please select a server');
           return;
         }
 
-        if (!apiKey) {
-          showError('Please enter an API key');
+        if (!apiKey || !apiKey.startsWith('sk-')) {
+          showError('Invalid API key format. Must start with sk-');
           return;
         }
 
         setLoading(true);
+        hideError();
+        hideResult();
 
         try {
           const response = await fetch('/api/check', {
@@ -288,15 +691,10 @@
           const payload = await response.json();
 
           if (!response.ok || !payload.ok) {
-            throw new Error((payload && payload.error && payload.error.message) || 'Failed to check balance');
+            throw new Error(payload && payload.error ? payload.error.message : 'Failed to check balance');
           }
 
-          resultServerName.textContent = `#${payload.server_id} - ${payload.server_name}`;
-          resultLatency.textContent = `${payload.latency_ms} ms`;
-          resultBalance.textContent = `$${payload.balance_usd}`;
-          resultUsage.textContent = `$${payload.usage_usd}`;
-          resultLimit.textContent = `$${payload.limit_usd}`;
-          resultBox.style.display = 'block';
+          showResult(payload);
         } catch (error) {
           showError(error.message || 'Failed to check balance');
         } finally {
@@ -304,24 +702,38 @@
         }
       });
 
-      function setLoading(isLoading) {
-        submitButton.disabled = isLoading;
-        submitButton.textContent = isLoading ? 'Checking...' : 'Check Balance';
-        loadingBox.style.display = isLoading ? 'block' : 'none';
+      function setLoading(loading) {
+        submitBtn.disabled = loading;
+        submitBtn.classList.toggle('loading', loading);
       }
 
-      function showError(message) {
-        errorBox.textContent = message;
-        errorBox.style.display = 'block';
-      }
+      function showResult(payload) {
+        document.querySelector('.result-server').textContent = `#${payload.server_id} - ${payload.server_name}`;
+        document.querySelector('.balance-value').textContent = `$${payload.balance_usd}`;
+        document.querySelector('.usage-value').textContent = `$${payload.usage_usd}`;
+        document.querySelector('.limit-value').textContent = `$${payload.limit_usd}`;
 
-      function hideError() {
-        errorBox.textContent = '';
-        errorBox.style.display = 'none';
+        const limit = parseFloat(payload.limit_usd);
+        const usage = parseFloat(payload.usage_usd);
+        const percentage = limit > 0 ? Math.min(100, (usage / limit) * 100) : 0;
+
+        document.querySelector('.progress-fill').style.width = `${percentage}%`;
+        document.querySelector('.progress-text').textContent = `${percentage.toFixed(1)}% used`;
+
+        resultBox.classList.remove('hidden');
       }
 
       function hideResult() {
-        resultBox.style.display = 'none';
+        resultBox.classList.add('hidden');
+      }
+
+      function showError(message) {
+        document.querySelector('.error-message').textContent = message;
+        errorBox.classList.remove('hidden');
+      }
+
+      function hideError() {
+        errorBox.classList.add('hidden');
       }
     </script>
   </body>

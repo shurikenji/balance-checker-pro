@@ -58,6 +58,7 @@
 - server list endpoint at `/api/servers`
 - public API contract uses `server_id`
 - `/check-balance` submits via `fetch('/api/check')`
+- UI aligned with the original project card layout and result progress bar
 - explicit server selection required
 - single key check through selected proxy
 - single check logs stored in DB
