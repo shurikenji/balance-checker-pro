@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const { getDatabase } = require('./db');
 const env = require('./config/env');
+const { getSessionStore } = require('./services/session-store');
 const adminRoutes = require('./modules/admin/routes');
 const publicCheckRoutes = require('./modules/public-check/routes');
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   session({
+    store: getSessionStore(),
     secret: env.sessionSecret,
     proxy: env.nodeEnv === 'production',
     resave: false,

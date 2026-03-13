@@ -23,6 +23,8 @@
 - SQLite database: `/var/lib/balance-checker-pro/app.db`
 - Backups: `/var/backups/balance-checker-pro`
 - Systemd unit: `/etc/systemd/system/balance-checker-pro.service`
+- Backup service: `/etc/systemd/system/balance-checker-pro-backup.service`
+- Backup timer: `/etc/systemd/system/balance-checker-pro-backup.timer`
 - Nginx site: `/etc/nginx/sites-available/balance-checker-pro`
 
 ## Phase 1: Prepare Local Repository On Windows
@@ -109,6 +111,8 @@ PORT=3000
 NODE_ENV=production
 SESSION_SECRET=<long-random-secret>
 DB_PATH=/var/lib/balance-checker-pro/app.db
+SESSION_DB_PATH=/var/lib/balance-checker-pro/app.db
+SESSION_CLEANUP_INTERVAL_MS=900000
 ENCRYPTION_KEY=<long-random-secret>
 WORKER_ENABLED=true
 WORKER_POLL_MS=3000
@@ -120,6 +124,8 @@ ADMIN_BOOTSTRAP_PASSWORD=<strong-password>
 Notes:
 
 - `SESSION_SECRET` and `ENCRYPTION_KEY` should be long random values.
+- `SESSION_DB_PATH` can stay equal to `DB_PATH` on the current VPS.
+- `SESSION_CLEANUP_INTERVAL_MS=900000` clears expired sessions every 15 minutes.
 - Leave `ADMIN_IP_ALLOWLIST` empty if your IP changes often.
 - Set `WORKER_ENABLED=true` because batch processing runs in the same app process.
 
@@ -150,6 +156,8 @@ Check status:
 sudo systemctl status balance-checker-pro
 sudo journalctl -u balance-checker-pro -n 100 --no-pager
 ```
+
+This app now uses a persistent SQLite session store instead of `MemoryStore`.
 
 ## Phase 7: Configure Nginx
 
@@ -285,6 +293,24 @@ Manual backup:
 sudo bash /opt/balance-checker-pro/deploy/scripts/backup-db.sh
 ```
 
+Automatic backup with `systemd`:
+
+```bash
+sudo cp /opt/balance-checker-pro/deploy/systemd/balance-checker-pro-backup.service /etc/systemd/system/balance-checker-pro-backup.service
+sudo cp /opt/balance-checker-pro/deploy/systemd/balance-checker-pro-backup.timer /etc/systemd/system/balance-checker-pro-backup.timer
+sudo systemctl daemon-reload
+sudo systemctl enable --now balance-checker-pro-backup.timer
+sudo systemctl status balance-checker-pro-backup.timer --no-pager
+```
+
+Run one backup immediately to verify:
+
+```bash
+sudo systemctl start balance-checker-pro-backup.service
+sudo journalctl -u balance-checker-pro-backup.service -n 20 --no-pager
+ls -lah /var/backups/balance-checker-pro
+```
+
 Optional cron entry:
 
 ```bash
@@ -299,6 +325,7 @@ Add:
 
 This keeps seven days of database copies by default.
 If `sqlite3` is installed, the script uses SQLite's native `.backup` command.
+You do not need cron if the `systemd` timer is enabled.
 
 ## Recommended Production Rules
 

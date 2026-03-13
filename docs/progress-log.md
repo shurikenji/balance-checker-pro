@@ -97,6 +97,10 @@
 - `nginx` site template
 - SQLite backup script
 
+15. Production persistence hardening
+- replaced `MemoryStore` with persistent SQLite session store
+- added automated SQLite backup via `systemd` timer
+
 ### Pending
 
 ## Notes

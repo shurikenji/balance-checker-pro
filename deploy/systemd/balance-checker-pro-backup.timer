@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Balance Checker Pro backup daily
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+Unit=balance-checker-pro-backup.service
+
+[Install]
+WantedBy=timers.target

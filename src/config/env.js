@@ -10,6 +10,14 @@ function resolveDbPath(dbPath) {
   return path.isAbsolute(dbPath) ? dbPath : path.resolve(rootDir, dbPath);
 }
 
+function resolveSessionDbPath(sessionDbPath, dbPath) {
+  if (!sessionDbPath) {
+    return resolveDbPath(dbPath);
+  }
+
+  return path.isAbsolute(sessionDbPath) ? sessionDbPath : path.resolve(rootDir, sessionDbPath);
+}
+
 function parseList(value) {
   return String(value || '')
     .split(',')
@@ -23,6 +31,8 @@ module.exports = {
   port: Number(process.env.PORT || 3000),
   sessionSecret: process.env.SESSION_SECRET || 'dev-session-secret-change-me',
   dbPath: resolveDbPath(process.env.DB_PATH),
+  sessionDbPath: resolveSessionDbPath(process.env.SESSION_DB_PATH, process.env.DB_PATH),
+  sessionCleanupIntervalMs: Number(process.env.SESSION_CLEANUP_INTERVAL_MS || 15 * 60 * 1000),
   encryptionKey: process.env.ENCRYPTION_KEY || 'change-this-32-byte-encryption-key',
   workerEnabled: String(process.env.WORKER_ENABLED || 'true').toLowerCase() !== 'false',
   workerPollMs: Number(process.env.WORKER_POLL_MS || 3000),

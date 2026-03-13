@@ -1,0 +1,12 @@
+[Unit]
+Description=Backup Balance Checker Pro SQLite database
+After=network.target
+
+[Service]
+Type=oneshot
+User=balancechecker
+Group=balancechecker
+WorkingDirectory=/opt/balance-checker-pro
+ExecStart=/bin/bash /opt/balance-checker-pro/deploy/scripts/backup-db.sh /var/lib/balance-checker-pro/app.db /var/backups/balance-checker-pro
+NoNewPrivileges=true
+PrivateTmp=true
