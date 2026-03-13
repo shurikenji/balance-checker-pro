@@ -221,14 +221,6 @@
               <strong>$<%= result.data.limit_usd %></strong>
             </div>
           </div>
-
-          <div class="meta">
-            Payment method:
-            <strong><%= result.data.has_payment_method ? 'available' : 'not found' %></strong><br />
-            Rate multiplier:
-            <strong><%= Number(result.data.rate_multiplier || 1).toFixed(2) %></strong><br />
-            Check id: <strong>#<%= result.id %></strong>
-          </div>
         </section>
         <% } %>
       </section>
