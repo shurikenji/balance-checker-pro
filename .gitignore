@@ -1,9 +1,10 @@
 node_modules/
 .env
 .env.*
+!deploy/env/.env.production.example
 dist/
 coverage/
-logs/
+/logs/
 *.log
 data/
 *.db
