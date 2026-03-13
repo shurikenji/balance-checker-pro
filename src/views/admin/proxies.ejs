@@ -1,320 +1,196 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: #f3f6f9;
-        color: #17212b;
-      }
+<%- include('partials/layout') %>
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        padding: 20px 28px;
-        background: #fff;
-        border-bottom: 1px solid #dde5ee;
-      }
-
-      nav {
-        display: flex;
-        gap: 16px;
-      }
-
-      nav a {
-        color: #175cd3;
-        text-decoration: none;
-        font-weight: 600;
-      }
-
-      main {
-        padding: 28px;
-        display: grid;
-        gap: 24px;
-      }
-
-      .panel {
-        padding: 24px;
-        border-radius: 18px;
-        background: #fff;
-        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
-      }
-
-      .messages {
-        display: grid;
-        gap: 12px;
-      }
-
-      .message {
-        padding: 12px 14px;
-        border-radius: 12px;
-      }
-
-      .message.error {
-        background: #fff0f0;
-        color: #9a1c1c;
-      }
-
-      .message.success {
-        background: #eefbf3;
-        color: #17663a;
-      }
-
-      form.grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-      }
-
-      input,
-      textarea {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1px solid #c9d5e2;
-        border-radius: 10px;
-        box-sizing: border-box;
-        font: inherit;
-      }
-
-      textarea {
-        min-height: 96px;
-        resize: vertical;
-      }
-
-      .full {
-        grid-column: 1 / -1;
-      }
-
-      button {
-        padding: 10px 14px;
-        border: 0;
-        border-radius: 10px;
-        background: #17212b;
-        color: #fff;
-        cursor: pointer;
-      }
-
-      .secondary {
-        background: #175cd3;
-      }
-
-      .danger {
-        background: #b42318;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        padding: 14px 10px;
-        border-bottom: 1px solid #e3e9ef;
-        text-align: left;
-        vertical-align: top;
-      }
-
-      .status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 700;
-      }
-
-      .status.active {
-        background: #eefbf3;
-        color: #17663a;
-      }
-
-      .status.disabled {
-        background: #fff0f0;
-        color: #9a1c1c;
-      }
-
-      .status.cooldown {
-        background: #fff8e8;
-        color: #8a5b00;
-      }
-
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .meta {
-        color: #5a6a79;
-        font-size: 0.92rem;
-        line-height: 1.5;
-      }
-    </style>
-  </head>
-  <body>
-    <%- include('partials/nav', { adminUser }) %>
-
-    <main>
       <% if (error || success) { %>
       <section class="messages">
         <% if (error) { %>
-        <div class="message error"><%= error %></div>
+        <div class="message error">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <%= error %>
+        </div>
         <% } %>
         <% if (success) { %>
-        <div class="message success"><%= success %></div>
+        <div class="message success">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <%= success %>
+        </div>
         <% } %>
       </section>
       <% } %>
 
-      <section class="panel">
-        <h1 style="margin-top: 0">Add Proxy</h1>
-        <p class="meta" style="margin-bottom: 20px">
-          Add an OpenAI-compatible proxy endpoint. Connectivity test checks whether
-          the base URL is reachable over HTTP.
-        </p>
+      <section class="card animate-fade-in">
+        <div class="card-header">
+          <h2 class="card-title">Add Proxy</h2>
+        </div>
+        <div class="card-body">
+          <p class="meta" style="margin-bottom: 20px">
+            Add an OpenAI-compatible proxy endpoint. Connectivity test checks whether
+            the base URL is reachable over HTTP.
+          </p>
 
-        <form method="post" action="/admin/proxies" class="grid">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <form method="post" action="/admin/proxies">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
 
-          <div>
-            <label for="name">Name</label>
-            <input id="name" name="name" type="text" required />
-          </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input id="name" name="name" type="text" required />
+              </div>
 
-          <div>
-            <label for="base_url">Base URL</label>
-            <input id="base_url" name="base_url" type="url" placeholder="https://proxy.example.com" required />
-          </div>
+              <div class="form-group">
+                <label for="base_url">Base URL</label>
+                <input id="base_url" name="base_url" type="url" placeholder="https://proxy.example.com" required />
+              </div>
 
-          <div>
-            <label for="timeout_ms">Timeout ms</label>
-            <input id="timeout_ms" name="timeout_ms" type="number" value="15000" min="1000" step="1000" required />
-          </div>
+              <div class="form-group">
+                <label for="timeout_ms">Timeout (ms)</label>
+                <input id="timeout_ms" name="timeout_ms" type="number" value="15000" min="1000" step="1000" required />
+              </div>
 
-          <div>
-            <label for="rate_multiplier">Rate multiplier</label>
-            <input id="rate_multiplier" name="rate_multiplier" type="number" value="1" min="0.01" step="0.01" required />
-          </div>
+              <div class="form-group">
+                <label for="rate_multiplier">Rate multiplier</label>
+                <input id="rate_multiplier" name="rate_multiplier" type="number" value="1" min="0.01" step="0.01" required />
+              </div>
 
-          <div>
-            <label for="weight">Weight</label>
-            <input id="weight" name="weight" type="number" value="100" min="1" required />
-          </div>
+              <div class="form-group">
+                <label for="weight">Weight</label>
+                <input id="weight" name="weight" type="number" value="100" min="1" required />
+              </div>
 
-          <div>
-            <label for="priority">Priority</label>
-            <input id="priority" name="priority" type="number" value="100" min="1" required />
-          </div>
+              <div class="form-group">
+                <label for="priority">Priority</label>
+                <input id="priority" name="priority" type="number" value="100" min="1" required />
+              </div>
 
-          <div>
-            <label for="max_concurrency">Max concurrency</label>
-            <input id="max_concurrency" name="max_concurrency" type="number" value="1" min="1" required />
-          </div>
+              <div class="form-group">
+                <label for="max_concurrency">Max concurrency</label>
+                <input id="max_concurrency" name="max_concurrency" type="number" value="1" min="1" required />
+              </div>
 
-          <div class="full">
-            <label for="notes">Notes</label>
-            <textarea id="notes" name="notes"></textarea>
-          </div>
+              <div class="form-group full">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" rows="3" placeholder="Optional notes about this proxy..."></textarea>
+              </div>
 
-          <div class="full">
-            <button type="submit" class="secondary">Create Proxy</button>
-          </div>
-        </form>
+              <div class="form-group full">
+                <button type="submit" class="btn btn-primary">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Create Proxy
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </section>
 
-      <section class="panel">
-        <h1 style="margin-top: 0">Proxy List</h1>
-        <p class="meta" style="margin-bottom: 20px">
-          Active and reachable proxies will be used later by the auto-router and
-          batch worker.
-        </p>
+      <section class="card animate-fade-in" style="margin-top: 24px;">
+        <div class="card-header">
+          <h2 class="card-title">Proxy List</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <p class="meta" style="padding: 20px 24px 0;">
+            Active and reachable proxies will be used later by the auto-router and batch worker.
+          </p>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Config</th>
-              <th>Health</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (!proxies.length) { %>
-            <tr>
-              <td colspan="4">No proxies yet.</td>
-            </tr>
-            <% } %>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Config</th>
+                  <th>Health</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!proxies.length) { %>
+                <tr>
+                  <td colspan="4">
+                    <div class="empty-state">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                      <h3>No proxies yet</h3>
+                      <p>Add your first proxy to get started</p>
+                    </div>
+                  </td>
+                </tr>
+                <% } %>
 
-            <% proxies.forEach((proxy) => { %>
-            <tr>
-              <td>
-                <strong><%= proxy.name %></strong>
-                <div class="meta"><%= proxy.base_url %></div>
-                <div class="status <%= proxy.status %>"><%= proxy.status %></div>
-              </td>
-              <td class="meta">
-                rate multiplier: <%= Number(proxy.rate_multiplier || 1).toFixed(2) %><br />
-                priority: <%= proxy.priority %><br />
-                weight: <%= proxy.weight %><br />
-                timeout: <%= proxy.timeout_ms %> ms<br />
-                max concurrency: <%= proxy.max_concurrency %><br />
-                <% if (proxy.notes) { %>notes: <%= proxy.notes %><% } %>
-              </td>
-              <td class="meta">
-                success: <%= proxy.success_count %><br />
-                failure: <%= proxy.failure_count %><br />
-                consecutive failures: <%= proxy.consecutive_failures %><br />
-                avg latency: <%= Number(proxy.avg_latency_ms || 0).toFixed(0) %> ms<br />
-                last success: <%= proxy.last_success_at || 'n/a' %><br />
-                last failure: <%= proxy.last_failure_at || 'n/a' %><br />
-                last error: <%= proxy.last_error || 'n/a' %>
-              </td>
-              <td>
-                <div class="actions">
-                  <form method="get" action="/admin/proxies/<%= proxy.id %>/edit">
-                    <button type="submit">Edit</button>
-                  </form>
+                <% proxies.forEach((proxy) => { %>
+                <tr>
+                  <td>
+                    <strong><%= proxy.name %></strong>
+                    <div class="meta" style="margin-bottom: 8px;"><%= proxy.base_url %></div>
+                    <span class="badge <%= proxy.status %>"><%= proxy.status %></span>
+                  </td>
+                  <td class="meta">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                      <span>Rate multiplier:</span> <strong><%= Number(proxy.rate_multiplier || 1).toFixed(2) %></strong>
+                      <span>Priority:</span> <strong><%= proxy.priority %></strong>
+                      <span>Weight:</span> <strong><%= proxy.weight %></strong>
+                      <span>Timeout:</span> <strong><%= proxy.timeout_ms %> ms</strong>
+                      <span>Max concurrency:</span> <strong><%= proxy.max_concurrency %></strong>
+                    </div>
+                    <% if (proxy.notes) { %>
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--color-border-light);">
+                      <span>Notes:</span> <%= proxy.notes %>
+                    </div>
+                    <% } %>
+                  </td>
+                  <td class="meta">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 16px;">
+                      <span>Success:</span> <strong style="color: var(--color-success);"><%= proxy.success_count %></strong>
+                      <span>Failure:</span> <strong style="color: var(--color-danger);"><%= proxy.failure_count %></strong>
+                      <span>Consecutive:</span> <strong><%= proxy.consecutive_failures %></strong>
+                      <span>Avg latency:</span> <strong><%= Number(proxy.avg_latency_ms || 0).toFixed(0) %> ms</strong>
+                    </div>
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--color-border-light);">
+                      <span>Last success:</span> <%= proxy.last_success_at || 'n/a' %><br />
+                      <span>Last failure:</span> <%= proxy.last_failure_at || 'n/a' %><br />
+                      <span>Last error:</span> <%= proxy.last_error || 'n/a' %>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="actions">
+                      <form method="get" action="/admin/proxies/<%= proxy.id %>/edit">
+                        <button type="submit" class="btn btn-outline btn-sm">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                          Edit
+                        </button>
+                      </form>
 
-                  <form method="post" action="/admin/proxies/<%= proxy.id %>/test">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                    <button type="submit" class="secondary">Test</button>
-                  </form>
+                      <form method="post" action="/admin/proxies/<%= proxy.id %>/test">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                        <button type="submit" class="btn btn-secondary btn-sm">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                          Test
+                        </button>
+                      </form>
 
-                  <form method="post" action="/admin/proxies/<%= proxy.id %>/toggle">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                    <input
-                      type="hidden"
-                      name="next_status"
-                      value="<%= proxy.status === 'disabled' ? 'active' : 'disabled' %>"
-                    />
-                    <button type="submit" class="<%= proxy.status === 'disabled' ? 'secondary' : 'danger' %>">
-                      <%= proxy.status === 'disabled' ? 'Enable' : 'Disable' %>
-                    </button>
-                  </form>
+                      <form method="post" action="/admin/proxies/<%= proxy.id %>/toggle">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                        <input type="hidden" name="next_status" value="<%= proxy.status === 'disabled' ? 'active' : 'disabled' %>" />
+                        <button type="submit" class="btn <%= proxy.status === 'disabled' ? 'btn-success' : 'btn-danger' %> btn-sm">
+                          <%= proxy.status === 'disabled' ? 'Enable' : 'Disable' %>
+                        </button>
+                      </form>
 
-                  <form method="post" action="/admin/proxies/<%= proxy.id %>/delete">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-                    <button type="submit" class="danger">Delete</button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+                      <form method="post" action="/admin/proxies/<%= proxy.id %>/delete">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this proxy?')">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
-    </main>
-  </body>
+    </div>
+  </main>
+</div>
+</body>
 </html>

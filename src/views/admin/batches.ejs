@@ -1,307 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: #f3f6f9;
-        color: #17212b;
-      }
+<%- include('partials/layout') %>
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        padding: 20px 28px;
-        background: #fff;
-        border-bottom: 1px solid #dde5ee;
-      }
-
-      nav {
-        display: flex;
-        gap: 16px;
-      }
-
-      nav a {
-        color: #175cd3;
-        text-decoration: none;
-        font-weight: 600;
-      }
-
-      main {
-        padding: 28px;
-        display: grid;
-        gap: 24px;
-      }
-
-      .panel {
-        padding: 24px;
-        border-radius: 18px;
-        background: #fff;
-        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
-      }
-
-      .messages {
-        display: grid;
-        gap: 12px;
-      }
-
-      .message {
-        padding: 12px 14px;
-        border-radius: 12px;
-      }
-
-      .message.error {
-        background: #fff0f0;
-        color: #9a1c1c;
-      }
-
-      .message.success {
-        background: #eefbf3;
-        color: #17663a;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-      }
-
-      .full {
-        grid-column: 1 / -1;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-      }
-
-      input,
-      select,
-      textarea {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1px solid #c9d5e2;
-        border-radius: 10px;
-        box-sizing: border-box;
-        font: inherit;
-      }
-
-      textarea {
-        min-height: 220px;
-        resize: vertical;
-        line-height: 1.5;
-      }
-
-      button {
-        padding: 10px 14px;
-        border: 0;
-        border-radius: 10px;
-        background: #175cd3;
-        color: #fff;
-        cursor: pointer;
-        font-weight: 700;
-      }
-
-      .link-btn {
-        display: inline-block;
-        margin-top: 10px;
-        color: #175cd3;
-        text-decoration: none;
-        font-weight: 700;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        padding: 14px 10px;
-        border-bottom: 1px solid #e3e9ef;
-        text-align: left;
-        vertical-align: top;
-      }
-
-      .meta {
-        color: #5a6a79;
-        font-size: 0.92rem;
-        line-height: 1.5;
-      }
-
-      .status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        background: #eef3ff;
-        color: #2449a8;
-      }
-
-      .status.completed {
-        background: #eefbf3;
-        color: #17663a;
-      }
-
-      .status.failed {
-        background: #fff0f0;
-        color: #9a1c1c;
-      }
-
-      .status.paused {
-        background: #eef3ff;
-        color: #2449a8;
-      }
-
-      .status.cancelled {
-        background: #f1f3f5;
-        color: #4c5b68;
-      }
-
-      .status.running {
-        background: #fff8e8;
-        color: #8a5b00;
-      }
-
-      .job-items {
-        margin-top: 12px;
-        padding: 12px;
-        border-radius: 12px;
-        background: #f8fafc;
-      }
-
-      .job-items ul {
-        margin: 0;
-        padding-left: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <%- include('partials/nav', { adminUser }) %>
-
-    <main>
       <% if (error || success) { %>
       <section class="messages">
         <% if (error) { %>
-        <div class="message error"><%= error %></div>
+        <div class="message error">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <%= error %>
+        </div>
         <% } %>
         <% if (success) { %>
-        <div class="message success"><%= success %></div>
+        <div class="message success">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <%= success %>
+        </div>
         <% } %>
       </section>
       <% } %>
 
-      <section class="panel">
-        <h1 style="margin-top: 0">Create Batch Job</h1>
-        <p class="meta" style="margin-bottom: 20px">
-          Paste keys into the text area with one key per line. File upload still works
-          as a fallback for `.txt` and `.csv`, but direct paste is the primary flow.
-          A specific proxy/server must be selected for every batch.
-        </p>
+      <section class="card animate-fade-in">
+        <div class="card-header">
+          <h2 class="card-title">Create Batch Job</h2>
+        </div>
+        <div class="card-body">
+          <p class="meta" style="margin-bottom: 20px">
+            Paste keys into the text area with one key per line. File upload still works
+            as a fallback for `.txt` and `.csv`, but direct paste is the primary flow.
+            A specific proxy/server must be selected for every batch.
+          </p>
 
-        <form method="post" action="/admin/batches" enctype="multipart/form-data" class="grid">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <form method="post" action="/admin/batches" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
 
-          <div>
-            <label for="proxy_id">Proxy selection</label>
-            <select id="proxy_id" name="proxy_id" required>
-              <option value="">Select proxy/server</option>
-              <% proxies.forEach((proxy) => { %>
-              <option value="<%= proxy.id %>"><%= proxy.name %> (<%= proxy.status %>)</option>
-              <% }) %>
-            </select>
-          </div>
-
-          <div class="full">
-            <label for="batch_keys">Batch keys</label>
-            <textarea
-              id="batch_keys"
-              name="batch_keys"
-              placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-yyyyyyyyyyyyyyyyyyyyyyyy&#10;sk-zzzzzzzzzzzzzzzzzzzzzzzz"
-            ></textarea>
-          </div>
-
-          <div class="full">
-            <label for="batch_file">Batch file</label>
-            <input id="batch_file" name="batch_file" type="file" accept=".txt,.csv,text/plain,text/csv" />
-            <div class="meta" style="margin-top: 8px">
-              Optional if you already pasted keys above.
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="proxy_id">Proxy selection</label>
+                <select id="proxy_id" name="proxy_id" required>
+                  <option value="">Select proxy/server</option>
+                  <% proxies.forEach((proxy) => { %>
+                  <option value="<%= proxy.id %>"><%= proxy.name %> (<%= proxy.status %>)</option>
+                  <% }) %>
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div class="full">
-            <button type="submit">Create Batch</button>
-          </div>
-        </form>
+            <div class="form-group full" style="margin-top: 20px;">
+              <label for="batch_keys">Batch keys</label>
+              <textarea
+                id="batch_keys"
+                name="batch_keys"
+                placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-yyyyyyyyyyyyyyyyyyyyyyyy&#10;sk-zzzzzzzzzzzzzzzzzzzzzzzz"
+                rows="6"
+              ></textarea>
+            </div>
+
+            <div class="form-group full" style="margin-top: 12px;">
+              <label for="batch_file">Batch file</label>
+              <input id="batch_file" name="batch_file" type="file" accept=".txt,.csv,text/plain,text/csv" />
+              <div class="meta" style="margin-top: 8px">
+                Optional if you already pasted keys above.
+              </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <button type="submit" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Create Batch
+              </button>
+            </div>
+          </form>
+        </div>
       </section>
 
-      <section class="panel">
-        <h1 style="margin-top: 0">Batch Jobs</h1>
-        <p class="meta" style="margin-bottom: 20px">
-          Jobs are queued and processed by the internal worker using the selected server.
-        </p>
+      <section class="card animate-fade-in" style="margin-top: 24px;">
+        <div class="card-header">
+          <h2 class="card-title">Batch Jobs</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <p class="meta" style="padding: 20px 24px 0;">
+            Jobs are queued and processed by the internal worker using the selected server.
+          </p>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Job</th>
-              <th>Status</th>
-              <th>Progress</th>
-              <th>Preview</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (!jobs.length) { %>
-            <tr>
-              <td colspan="4">No batch jobs yet.</td>
-            </tr>
-            <% } %>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                  <th>Preview</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!jobs.length) { %>
+                <tr>
+                  <td colspan="4">
+                    <div class="empty-state">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                      <h3>No batch jobs yet</h3>
+                      <p>Create your first batch job to get started</p>
+                    </div>
+                  </td>
+                </tr>
+                <% } %>
 
-            <% jobs.forEach((job) => { %>
-            <tr>
-              <td>
-                <strong>#<%= job.id %></strong>
-                <div class="meta">
-                  requested proxy: <%= job.requested_proxy_name || 'missing' %><br />
-                  created by: <%= job.created_by_username || 'system' %><br />
-                  created at: <%= job.created_at %>
-                </div>
-              </td>
-              <td>
-                <span class="status <%= job.status %>"><%= job.status %></span>
-              </td>
-              <td class="meta">
-                total: <%= job.total_items %><br />
-                processed: <%= job.processed_items %><br />
-                success: <%= job.success_items %><br />
-                failed: <%= job.failed_items %>
-              </td>
-              <td>
-                <div class="job-items">
-                  <div class="meta" style="margin-bottom: 8px">First <%= job.itemsPreview.length %> items</div>
-                  <ul>
-                    <% job.itemsPreview.forEach((item) => { %>
-                    <li>
-                      line <%= item.line_number %> - <%= item.api_key_mask %> - <%= item.status %>
-                    </li>
-                    <% }) %>
-                  </ul>
-                  <a class="link-btn" href="/admin/batches/<%= job.id %>">View details</a>
-                </div>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+                <% jobs.forEach((job) => { %>
+                <tr>
+                  <td>
+                    <strong>#<%= job.id %></strong>
+                    <div class="meta">
+                      requested proxy: <%= job.requested_proxy_name || 'missing' %><br />
+                      created by: <%= job.created_by_username || 'system' %><br />
+                      created at: <%= job.created_at %>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge <%= job.status %>"><%= job.status %></span>
+                  </td>
+                  <td class="meta">
+                    total: <%= job.total_items %><br />
+                    processed: <%= job.processed_items %><br />
+                    success: <%= job.success_items %><br />
+                    failed: <%= job.failed_items %>
+                  </td>
+                  <td>
+                    <div style="background: var(--color-border-light); padding: 12px; border-radius: var(--radius-md);">
+                      <div class="meta" style="margin-bottom: 8px">First <%= job.itemsPreview.length %> items</div>
+                      <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+                        <% job.itemsPreview.forEach((item) => { %>
+                        <li style="margin-bottom: 4px;">
+                          line <%= item.line_number %> - <%= item.api_key_mask %> - <span class="badge <%= item.status %>" style="font-size: 11px; padding: 2px 8px;"><%= item.status %></span>
+                        </li>
+                        <% }) %>
+                      </ul>
+                      <a href="/admin/batches/<%= job.id %>" class="btn btn-outline btn-sm" style="margin-top: 12px; display: inline-flex;">
+                        View details
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
-    </main>
-  </body>
+    </div>
+  </main>
+</div>
+</body>
 </html>

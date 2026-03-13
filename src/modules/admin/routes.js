@@ -111,6 +111,7 @@ router.get('/', requireAdmin, (req, res) => {
   res.render('admin/dashboard', {
     title: 'Admin Dashboard',
     adminUser: req.session.adminUser,
+    page: 'dashboard',
     proxySummary,
     batchSummary,
   });
@@ -120,6 +121,7 @@ router.get('/proxies', requireAdmin, (req, res) => {
   res.render('admin/proxies', {
     title: 'Proxy Management',
     adminUser: req.session.adminUser,
+    page: 'proxies',
     proxies: listProxies(),
     error: req.query.error || '',
     success: req.query.success || '',
@@ -137,6 +139,8 @@ router.get('/proxies/:id/edit', requireAdmin, (req, res) => {
   return res.render('admin/proxy-edit', {
     title: 'Edit Proxy',
     adminUser: req.session.adminUser,
+    page: 'proxies',
+    subtitle: `Update configuration for ${proxy.name}`,
     proxy,
     error: req.query.error || '',
   });
@@ -266,6 +270,7 @@ router.get('/batches', requireAdmin, (req, res) => {
   res.render('admin/batches', {
     title: 'Batch Jobs',
     adminUser: req.session.adminUser,
+    page: 'batches',
     proxies: listProxies().filter((proxy) => proxy.status === 'active'),
     jobs,
     error: req.query.error || '',
@@ -284,6 +289,7 @@ router.get('/logs', requireAdmin, (req, res) => {
   res.render('admin/logs', {
     title: 'Check Logs',
     adminUser: req.session.adminUser,
+    page: 'logs',
     logs: listCheckLogs(filters),
     proxies: listProxies(),
     filters,
@@ -294,6 +300,7 @@ router.get('/settings', requireAdmin, (req, res) => {
   res.render('admin/settings', {
     title: 'System Settings',
     adminUser: req.session.adminUser,
+    page: 'settings',
     settings: listSettings(),
     error: req.query.error || '',
     success: req.query.success || '',
@@ -330,6 +337,8 @@ router.get('/batches/:id', requireAdmin, (req, res) => {
   res.render('admin/batch-detail', {
     title: `Batch #${job.id}`,
     adminUser: req.session.adminUser,
+    page: 'batches',
+    subtitle: `Requested server: ${job.requested_proxy_name || 'missing'}`,
     job,
     stats: getBatchJobStats(jobId),
     items: listBatchJobItemsDetailed(jobId),

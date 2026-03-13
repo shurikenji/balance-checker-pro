@@ -1,260 +1,133 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: #f3f6f9;
-        color: #17212b;
-      }
+<%- include('partials/layout') %>
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        padding: 20px 28px;
-        background: #fff;
-        border-bottom: 1px solid #dde5ee;
-      }
+      <section class="card animate-fade-in">
+        <div class="card-header">
+          <h2 class="card-title">Check Logs</h2>
+        </div>
+        <div class="card-body">
+          <p class="meta" style="margin-bottom: 20px">
+            Combined view of public single checks and batch item executions.
+          </p>
 
-      nav {
-        display: flex;
-        gap: 16px;
-      }
+          <form method="get" action="/admin/logs" class="filters">
+            <div class="form-group">
+              <label for="type">Type</label>
+              <select id="type" name="type">
+                <option value="" <%= !filters.type ? 'selected' : '' %>>All</option>
+                <option value="single" <%= filters.type === 'single' ? 'selected' : '' %>>Single</option>
+                <option value="batch" <%= filters.type === 'batch' ? 'selected' : '' %>>Batch</option>
+              </select>
+            </div>
 
-      nav a {
-        color: #175cd3;
-        text-decoration: none;
-        font-weight: 600;
-      }
+            <div class="form-group">
+              <label for="status">Status</label>
+              <select id="status" name="status">
+                <option value="" <%= !filters.status ? 'selected' : '' %>>All</option>
+                <option value="success" <%= filters.status === 'success' ? 'selected' : '' %>>Success</option>
+                <option value="failed" <%= filters.status === 'failed' ? 'selected' : '' %>>Failed</option>
+                <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                <option value="running" <%= filters.status === 'running' ? 'selected' : '' %>>Running</option>
+                <option value="skipped" <%= filters.status === 'skipped' ? 'selected' : '' %>>Skipped</option>
+              </select>
+            </div>
 
-      main {
-        padding: 28px;
-        display: grid;
-        gap: 24px;
-      }
+            <div class="form-group">
+              <label for="proxy_id">Proxy</label>
+              <select id="proxy_id" name="proxy_id">
+                <option value="" <%= !filters.proxyId ? 'selected' : '' %>>All</option>
+                <% proxies.forEach((proxy) => { %>
+                <option value="<%= proxy.id %>" <%= filters.proxyId === String(proxy.id) ? 'selected' : '' %>><%= proxy.name %></option>
+                <% }) %>
+              </select>
+            </div>
 
-      .panel {
-        padding: 24px;
-        border-radius: 18px;
-        background: #fff;
-        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
-      }
+            <div class="form-group">
+              <label for="limit">Limit</label>
+              <input id="limit" name="limit" type="number" min="1" max="500" value="<%= filters.limit || '100' %>" style="width: 100px;" />
+            </div>
 
-      form {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-      }
+            <button type="submit" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Apply
+            </button>
 
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-      }
-
-      input,
-      select {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1px solid #c9d5e2;
-        border-radius: 10px;
-        box-sizing: border-box;
-        font: inherit;
-      }
-
-      button {
-        padding: 10px 14px;
-        border: 0;
-        border-radius: 10px;
-        background: #175cd3;
-        color: #fff;
-        cursor: pointer;
-        font-weight: 700;
-      }
-
-      .actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        grid-column: 1 / -1;
-      }
-
-      .secondary-link {
-        display: inline-block;
-        padding: 10px 14px;
-        border-radius: 10px;
-        background: #17212b;
-        color: #fff;
-        text-decoration: none;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        padding: 14px 10px;
-        border-bottom: 1px solid #e3e9ef;
-        text-align: left;
-        vertical-align: top;
-      }
-
-      .meta {
-        color: #5a6a79;
-        font-size: 0.92rem;
-        line-height: 1.5;
-      }
-
-      .status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        background: #eef3ff;
-        color: #2449a8;
-      }
-
-      .status.success {
-        background: #eefbf3;
-        color: #17663a;
-      }
-
-      .status.failed {
-        background: #fff0f0;
-        color: #9a1c1c;
-      }
-
-      .status.pending,
-      .status.running {
-        background: #fff8e8;
-        color: #8a5b00;
-      }
-
-      .status.skipped,
-      .status.cancelled {
-        background: #f1f3f5;
-        color: #4c5b68;
-      }
-    </style>
-  </head>
-  <body>
-    <%- include('partials/nav', { adminUser }) %>
-
-    <main>
-      <section class="panel">
-        <h1 style="margin-top: 0">Check Logs</h1>
-        <p class="meta" style="margin-bottom: 20px">
-          Combined view of public single checks and batch item executions.
-        </p>
-
-        <form method="get" action="/admin/logs">
-          <div>
-            <label for="type">Type</label>
-            <select id="type" name="type">
-              <option value="" <%= !filters.type ? 'selected' : '' %>>All</option>
-              <option value="single" <%= filters.type === 'single' ? 'selected' : '' %>>Single</option>
-              <option value="batch" <%= filters.type === 'batch' ? 'selected' : '' %>>Batch</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="status">Status</label>
-            <select id="status" name="status">
-              <option value="" <%= !filters.status ? 'selected' : '' %>>All</option>
-              <option value="success" <%= filters.status === 'success' ? 'selected' : '' %>>Success</option>
-              <option value="failed" <%= filters.status === 'failed' ? 'selected' : '' %>>Failed</option>
-              <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
-              <option value="running" <%= filters.status === 'running' ? 'selected' : '' %>>Running</option>
-              <option value="skipped" <%= filters.status === 'skipped' ? 'selected' : '' %>>Skipped</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="proxy_id">Proxy</label>
-            <select id="proxy_id" name="proxy_id">
-              <option value="" <%= !filters.proxyId ? 'selected' : '' %>>All</option>
-              <% proxies.forEach((proxy) => { %>
-              <option value="<%= proxy.id %>" <%= filters.proxyId === String(proxy.id) ? 'selected' : '' %>><%= proxy.name %></option>
-              <% }) %>
-            </select>
-          </div>
-
-          <div>
-            <label for="limit">Limit</label>
-            <input id="limit" name="limit" type="number" min="1" max="500" value="<%= filters.limit || '100' %>" />
-          </div>
-
-          <div class="actions">
-            <button type="submit">Apply Filters</button>
-            <a class="secondary-link" href="/admin/logs">Reset</a>
-          </div>
-        </form>
+            <a href="/admin/logs" class="btn btn-outline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+              Reset
+            </a>
+          </form>
+        </div>
       </section>
 
-      <section class="panel">
-        <table>
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Key</th>
-              <th>Status</th>
-              <th>Proxy</th>
-              <th>Result</th>
-              <th>Error</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (!logs.length) { %>
-            <tr>
-              <td colspan="6">No logs found.</td>
-            </tr>
-            <% } %>
-
-            <% logs.forEach((log) => { %>
-            <tr>
-              <td class="meta">
-                <strong><%= log.source_type %></strong><br />
-                #<%= log.source_id %><br />
-                <%= log.created_at %>
-              </td>
-              <td class="meta">
-                <strong><%= log.api_key_mask %></strong><br />
-                latency: <%= log.response_time_ms || 'n/a' %> ms
-              </td>
-              <td>
-                <span class="status <%= log.status %>"><%= log.status %></span>
-              </td>
-              <td class="meta">
-                <%= log.proxy_name || 'n/a' %>
-              </td>
-              <td class="meta">
-                <% if (log.balance_usd !== null && log.balance_usd !== undefined) { %>
-                balance: $<%= log.balance_usd %><br />
-                usage: $<%= log.usage_usd %><br />
-                limit: $<%= log.limit_usd %><br />
-                payment: <%= log.has_payment_method ? 'yes' : 'no' %>
-                <% } else { %>
-                n/a
+      <section class="card animate-fade-in" style="margin-top: 24px;">
+        <div class="card-body" style="padding: 0;">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Key</th>
+                  <th>Status</th>
+                  <th>Proxy</th>
+                  <th>Result</th>
+                  <th>Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!logs.length) { %>
+                <tr>
+                  <td colspan="6">
+                    <div class="empty-state">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                      <h3>No logs found</h3>
+                      <p>No log entries match your current filters</p>
+                    </div>
+                  </td>
+                </tr>
                 <% } %>
-              </td>
-              <td class="meta">
-                <%= log.error_code || 'n/a' %><br />
-                <%= log.error_message || 'n/a' %>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+
+                <% logs.forEach((log) => { %>
+                <tr>
+                  <td>
+                    <strong><%= log.source_type %></strong>
+                    <div class="meta">#<%= log.source_id %></div>
+                    <div class="meta"><%= log.created_at %></div>
+                  </td>
+                  <td>
+                    <strong><%= log.api_key_mask %></strong>
+                    <div class="meta">latency: <%= log.response_time_ms || 'n/a' %> ms</div>
+                  </td>
+                  <td>
+                    <span class="badge <%= log.status %>"><%= log.status %></span>
+                  </td>
+                  <td class="meta">
+                    <%= log.proxy_name || 'n/a' %>
+                  </td>
+                  <td class="meta">
+                    <% if (log.balance_usd !== null && log.balance_usd !== undefined) { %>
+                    <div style="display: grid; gap: 2px;">
+                      <span>Balance: <strong>$<%= log.balance_usd %></strong></span>
+                      <span>Usage: <strong>$<%= log.usage_usd %></strong></span>
+                      <span>Limit: <strong>$<%= log.limit_usd %></strong></span>
+                      <span>Payment: <strong><%= log.has_payment_method ? 'Yes' : 'No' %></strong></span>
+                    </div>
+                    <% } else { %>
+                    n/a
+                    <% } %>
+                  </td>
+                  <td class="meta">
+                    <%= log.error_code || 'n/a' %><br />
+                    <%= log.error_message || 'n/a' %>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
-    </main>
-  </body>
+    </div>
+  </main>
+</div>
+</body>
 </html>

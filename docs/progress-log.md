@@ -101,6 +101,12 @@
 - replaced `MemoryStore` with persistent SQLite session store
 - added automated SQLite backup via `systemd` timer
 
+16. Admin layout consolidation
+- fixed broken layout include paths after the UI refactor
+- passed active `page` state to all admin routes
+- moved proxy edit and batch detail to the new shared admin shell
+- removed the obsolete legacy admin nav partial
+
 ### Pending
 
 ## Notes

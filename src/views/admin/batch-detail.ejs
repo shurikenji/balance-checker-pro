@@ -1,346 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: #f3f6f9;
-        color: #17212b;
-      }
+<%- include('partials/layout') %>
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        padding: 20px 28px;
-        background: #fff;
-        border-bottom: 1px solid #dde5ee;
-      }
-
-      nav {
-        display: flex;
-        gap: 16px;
-      }
-
-      nav a {
-        color: #175cd3;
-        text-decoration: none;
-        font-weight: 600;
-      }
-
-      main {
-        padding: 28px;
-        display: grid;
-        gap: 24px;
-      }
-
-      .panel {
-        padding: 24px;
-        border-radius: 18px;
-        background: #fff;
-        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
-      }
-
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-      }
-
-      .stat {
-        padding: 18px;
-        border-radius: 16px;
-        background: #f8fafc;
-      }
-
-      .stat span {
-        display: block;
-        color: #5d6f80;
-        margin-bottom: 8px;
-      }
-
-      .stat strong {
-        font-size: 1.5rem;
-      }
-
-      .meta {
-        color: #5a6a79;
-        font-size: 0.92rem;
-        line-height: 1.6;
-      }
-
-      .messages {
-        display: grid;
-        gap: 12px;
-      }
-
-      .message {
-        padding: 12px 14px;
-        border-radius: 12px;
-      }
-
-      .message.error {
-        background: #fff0f0;
-        color: #9a1c1c;
-      }
-
-      .message.success {
-        background: #eefbf3;
-        color: #17663a;
-      }
-
-      .status {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        background: #eef3ff;
-        color: #2449a8;
-      }
-
-      .status.success,
-      .status.completed {
-        background: #eefbf3;
-        color: #17663a;
-      }
-
-      .status.failed {
-        background: #fff0f0;
-        color: #9a1c1c;
-      }
-
-      .status.paused {
-        background: #eef3ff;
-        color: #2449a8;
-      }
-
-      .status.cancelled {
-        background: #f1f3f5;
-        color: #4c5b68;
-      }
-
-      .status.running {
-        background: #fff8e8;
-        color: #8a5b00;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        padding: 14px 10px;
-        border-bottom: 1px solid #e3e9ef;
-        text-align: left;
-        vertical-align: top;
-      }
-
-      .link-btn {
-        display: inline-block;
-        padding: 10px 14px;
-        border-radius: 10px;
-        background: #17212b;
-        color: #fff;
-        text-decoration: none;
-      }
-
-      .link-row {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .action-row {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-top: 18px;
-      }
-
-      .action-row form {
-        margin: 0;
-      }
-
-      .action-btn {
-        padding: 10px 14px;
-        border: 0;
-        border-radius: 10px;
-        color: #fff;
-        cursor: pointer;
-        font-weight: 700;
-      }
-
-      .pause-btn {
-        background: #175cd3;
-      }
-
-      .resume-btn {
-        background: #17663a;
-      }
-
-      .cancel-btn {
-        background: #b42318;
-      }
-
-      .retry-btn {
-        background: #7a4cff;
-      }
-    </style>
-  </head>
-  <body>
-    <%- include('partials/nav', { adminUser }) %>
-
-    <main>
       <% if (error || success) { %>
       <section class="messages">
         <% if (error) { %>
-        <div class="message error"><%= error %></div>
+        <div class="message error">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <%= error %>
+        </div>
         <% } %>
         <% if (success) { %>
-        <div class="message success"><%= success %></div>
+        <div class="message success">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <%= success %>
+        </div>
         <% } %>
       </section>
       <% } %>
 
-      <section class="panel">
-        <div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center;">
-          <div>
-            <h1 style="margin: 0 0 10px">Batch #<%= job.id %></h1>
-            <div class="meta">
-              requested server: <strong><%= job.requested_proxy_name || 'missing' %></strong><br />
-              created by: <strong><%= job.created_by_username || 'system' %></strong><br />
-              created at: <strong><%= job.created_at %></strong><br />
-              started at: <strong><%= job.started_at || 'n/a' %></strong><br />
-              finished at: <strong><%= job.finished_at || 'n/a' %></strong>
+      <section class="card animate-fade-in">
+        <div class="card-header">
+          <h2 class="card-title">Job Details</h2>
+          <div class="btn-group">
+            <span class="badge <%= job.status %>"><%= job.status %></span>
+            <a href="/admin/batches" class="btn btn-outline btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+              Back to Batches
+            </a>
+            <a href="/admin/batches/<%= job.id %>/export.csv" class="btn btn-outline btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </a>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="meta">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+              <div><strong>Requested server</strong><br /><%= job.requested_proxy_name || 'missing' %></div>
+              <div><strong>Created by</strong><br /><%= job.created_by_username || 'system' %></div>
+              <div><strong>Created at</strong><br /><%= job.created_at %></div>
+              <div><strong>Started at</strong><br /><%= job.started_at || 'n/a' %></div>
+              <div><strong>Finished at</strong><br /><%= job.finished_at || 'n/a' %></div>
             </div>
           </div>
-          <div>
-            <span class="status <%= job.status %>"><%= job.status %></span>
-          </div>
-        </div>
 
-        <div class="action-row">
-          <% if (job.status === 'queued' || job.status === 'running') { %>
-          <form method="post" action="/admin/batches/<%= job.id %>/pause">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button class="action-btn pause-btn" type="submit">Pause</button>
-          </form>
-          <form method="post" action="/admin/batches/<%= job.id %>/cancel">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button class="action-btn cancel-btn" type="submit">Cancel Pending</button>
-          </form>
-          <% } %>
-
-          <% if (job.status === 'paused') { %>
-          <form method="post" action="/admin/batches/<%= job.id %>/resume">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button class="action-btn resume-btn" type="submit">Resume</button>
-          </form>
-          <form method="post" action="/admin/batches/<%= job.id %>/cancel">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button class="action-btn cancel-btn" type="submit">Cancel Pending</button>
-          </form>
-          <% } %>
-
-          <% if (job.status === 'failed' || job.status === 'completed' || job.status === 'cancelled' || job.status === 'paused') { %>
-          <form method="post" action="/admin/batches/<%= job.id %>/retry-failed">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-            <button class="action-btn retry-btn" type="submit">Retry Failed</button>
-          </form>
-          <% } %>
-        </div>
-      </section>
-
-      <section class="stats">
-        <div class="stat">
-          <span>Total items</span>
-          <strong><%= stats.total_items || 0 %></strong>
-        </div>
-        <div class="stat">
-          <span>Pending</span>
-          <strong><%= stats.pending_items || 0 %></strong>
-        </div>
-        <div class="stat">
-          <span>Running</span>
-          <strong><%= stats.running_items || 0 %></strong>
-        </div>
-        <div class="stat">
-          <span>Success</span>
-          <strong><%= stats.success_items || 0 %></strong>
-        </div>
-        <div class="stat">
-          <span>Failed</span>
-          <strong><%= stats.failed_items || 0 %></strong>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 16px;">
-          <h2 style="margin: 0">Items</h2>
-          <div class="link-row">
-            <a class="link-btn" href="/admin/batches/<%= job.id %>/export.csv">Export CSV</a>
-            <a class="link-btn" href="/admin/batches">Back to Batches</a>
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Key</th>
-              <th>Status</th>
-              <th>Proxy</th>
-              <th>Result</th>
-              <th>Error</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (!items.length) { %>
-            <tr>
-              <td colspan="5">No items found for this batch.</td>
-            </tr>
+          <div class="action-row">
+            <% if (job.status === 'queued' || job.status === 'running') { %>
+            <form method="post" action="/admin/batches/<%= job.id %>/pause">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="action-btn pause-btn" type="submit">Pause</button>
+            </form>
+            <form method="post" action="/admin/batches/<%= job.id %>/cancel">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="action-btn cancel-btn" type="submit">Cancel Pending</button>
+            </form>
             <% } %>
 
-            <% items.forEach((item) => { %>
-            <tr>
-              <td class="meta">
-                line <%= item.line_number %><br />
-                <strong><%= item.api_key_mask %></strong><br />
-                attempts: <%= item.attempt_count %><br />
-                latency: <%= item.response_time_ms || 'n/a' %> ms
-              </td>
-              <td>
-                <span class="status <%= item.status %>"><%= item.status %></span>
-              </td>
-              <td class="meta">
-                <%= item.proxy_name || job.requested_proxy_name || 'n/a' %>
-              </td>
-              <td class="meta">
-                <% if (item.balance_usd !== null && item.balance_usd !== undefined) { %>
-                balance: $<%= item.balance_usd %><br />
-                usage: $<%= item.usage_usd %><br />
-                limit: $<%= item.limit_usd %><br />
-                payment: <%= item.has_payment_method ? 'yes' : 'no' %>
-                <% } else { %>
-                n/a
-                <% } %>
-              </td>
-              <td class="meta">
-                <%= item.error_code || 'n/a' %><br />
-                <%= item.error_message || 'n/a' %>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+            <% if (job.status === 'paused') { %>
+            <form method="post" action="/admin/batches/<%= job.id %>/resume">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="action-btn resume-btn" type="submit">Resume</button>
+            </form>
+            <form method="post" action="/admin/batches/<%= job.id %>/cancel">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="action-btn cancel-btn" type="submit">Cancel Pending</button>
+            </form>
+            <% } %>
+
+            <% if (job.status === 'failed' || job.status === 'completed' || job.status === 'cancelled' || job.status === 'paused') { %>
+            <form method="post" action="/admin/batches/<%= job.id %>/retry-failed">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="action-btn retry-btn" type="submit">Retry Failed</button>
+            </form>
+            <% } %>
+          </div>
+        </div>
       </section>
-    </main>
-  </body>
+
+      <section class="stats-grid" style="margin-top: 24px;">
+        <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value"><%= stats.total_items || 0 %></div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value"><%= stats.pending_items || 0 %></div></div>
+        <div class="stat-card"><div class="stat-label">Running</div><div class="stat-value"><%= stats.running_items || 0 %></div></div>
+        <div class="stat-card"><div class="stat-label">Success</div><div class="stat-value"><%= stats.success_items || 0 %></div></div>
+        <div class="stat-card"><div class="stat-label">Failed</div><div class="stat-value"><%= stats.failed_items || 0 %></div></div>
+      </section>
+
+      <section class="card animate-fade-in">
+        <div class="card-header">
+          <h2 class="card-title">Items</h2>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Status</th>
+                  <th>Server</th>
+                  <th>Result</th>
+                  <th>Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!items.length) { %>
+                <tr>
+                  <td colspan="5">
+                    <div class="empty-state">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                      <h3>No items found</h3>
+                      <p>This batch does not contain any items yet.</p>
+                    </div>
+                  </td>
+                </tr>
+                <% } %>
+
+                <% items.forEach((item) => { %>
+                <tr>
+                  <td class="meta">
+                    line <%= item.line_number %><br />
+                    <strong><%= item.api_key_mask %></strong><br />
+                    attempts: <%= item.attempt_count %><br />
+                    latency: <%= item.response_time_ms || 'n/a' %> ms
+                  </td>
+                  <td>
+                    <span class="badge <%= item.status %>"><%= item.status %></span>
+                  </td>
+                  <td class="meta">
+                    <%= item.proxy_name || job.requested_proxy_name || 'n/a' %>
+                  </td>
+                  <td class="meta">
+                    <% if (item.balance_usd !== null && item.balance_usd !== undefined) { %>
+                    Balance: <strong>$<%= item.balance_usd %></strong><br />
+                    Usage: <strong>$<%= item.usage_usd %></strong><br />
+                    Limit: <strong>$<%= item.limit_usd %></strong><br />
+                    Payment: <strong><%= item.has_payment_method ? 'Yes' : 'No' %></strong>
+                    <% } else { %>
+                    n/a
+                    <% } %>
+                  </td>
+                  <td class="meta">
+                    <%= item.error_code || 'n/a' %><br />
+                    <%= item.error_message || 'n/a' %>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</body>
 </html>

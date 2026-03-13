@@ -1,150 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %></title>
-    <style>
-      body {
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: #f3f6f9;
-        color: #17212b;
-      }
+<%- include('partials/layout') %>
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        padding: 20px 28px;
-        background: #fff;
-        border-bottom: 1px solid #dde5ee;
-      }
-
-      nav {
-        display: flex;
-        gap: 16px;
-      }
-
-      nav a {
-        color: #175cd3;
-        text-decoration: none;
-        font-weight: 600;
-      }
-
-      main {
-        padding: 28px;
-      }
-
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-      }
-
-      .stat-card {
-        padding: 20px;
-        border-radius: 18px;
-        background: #fff;
-        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
-      }
-
-      .stat-card strong {
-        display: block;
-        margin-top: 10px;
-        font-size: 1.8rem;
-      }
-
-      .panel {
-        max-width: 900px;
-        padding: 24px;
-        border-radius: 18px;
-        background: #fff;
-        box-shadow: 0 16px 36px rgba(23, 33, 43, 0.08);
-      }
-
-      h1 {
-        margin: 0 0 8px;
-      }
-
-      p {
-        margin: 0;
-        color: #566574;
-        line-height: 1.6;
-      }
-
-      button {
-        padding: 10px 14px;
-        border: 0;
-        border-radius: 10px;
-        background: #17212b;
-        color: #fff;
-        cursor: pointer;
-      }
-
-      ul {
-        margin-top: 20px;
-        padding-left: 20px;
-        color: #344454;
-      }
-    </style>
-  </head>
-  <body>
-    <%- include('partials/nav', { adminUser }) %>
-
-    <main>
-      <section class="stats">
-        <div class="stat-card">
-          <span>Total proxies</span>
-          <strong><%= proxySummary.total || 0 %></strong>
+      <section class="stats-grid">
+        <div class="stat-card animate-slide-up stagger-1">
+          <div class="stat-icon primary">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div class="stat-label">Total Proxies</div>
+          <div class="stat-value"><%= proxySummary.total || 0 %></div>
         </div>
-        <div class="stat-card">
-          <span>Active proxies</span>
-          <strong><%= proxySummary.active || 0 %></strong>
+        <div class="stat-card animate-slide-up stagger-2">
+          <div class="stat-icon success">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="stat-label">Active Proxies</div>
+          <div class="stat-value"><%= proxySummary.active || 0 %></div>
         </div>
-        <div class="stat-card">
-          <span>Disabled proxies</span>
-          <strong><%= proxySummary.disabled || 0 %></strong>
+        <div class="stat-card animate-slide-up stagger-3">
+          <div class="stat-icon danger">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <div class="stat-label">Disabled Proxies</div>
+          <div class="stat-value"><%= proxySummary.disabled || 0 %></div>
         </div>
-        <div class="stat-card">
-          <span>Cooldown proxies</span>
-          <strong><%= proxySummary.cooldown || 0 %></strong>
+        <div class="stat-card animate-slide-up stagger-4">
+          <div class="stat-icon warning">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          </div>
+          <div class="stat-label">Cooldown Proxies</div>
+          <div class="stat-value"><%= proxySummary.cooldown || 0 %></div>
         </div>
-        <div class="stat-card">
-          <span>Total batch jobs</span>
-          <strong><%= batchSummary.total || 0 %></strong>
+        <div class="stat-card animate-slide-up stagger-5">
+          <div class="stat-icon info">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="stat-label">Total Batch Jobs</div>
+          <div class="stat-value"><%= batchSummary.total || 0 %></div>
         </div>
-        <div class="stat-card">
-          <span>Queued jobs</span>
-          <strong><%= batchSummary.queued || 0 %></strong>
+        <div class="stat-card animate-slide-up stagger-6">
+          <div class="stat-icon primary">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="stat-label">Queued Jobs</div>
+          <div class="stat-value"><%= batchSummary.queued || 0 %></div>
         </div>
-        <div class="stat-card">
-          <span>Running jobs</span>
-          <strong><%= batchSummary.running || 0 %></strong>
+        <div class="stat-card animate-slide-up stagger-7">
+          <div class="stat-icon warning">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          </div>
+          <div class="stat-label">Running Jobs</div>
+          <div class="stat-value"><%= batchSummary.running || 0 %></div>
         </div>
-        <div class="stat-card">
-          <span>Completed jobs</span>
-          <strong><%= batchSummary.completed || 0 %></strong>
+        <div class="stat-card animate-slide-up stagger-8">
+          <div class="stat-icon success">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="stat-label">Completed Jobs</div>
+          <div class="stat-value"><%= batchSummary.completed || 0 %></div>
         </div>
       </section>
 
-      <section class="panel">
-        <h1>Admin Dashboard</h1>
-        <p>
-          Admin authentication, proxy management, and batch queue intake are
-          working. The next implementation steps are worker execution, single checks,
-          and detailed logs.
-        </p>
-
-        <ul>
-          <li>Proxy management module: available</li>
-          <li>Batch upload module: available</li>
-          <li>Check logs module: pending</li>
-          <li>System settings module: pending</li>
-        </ul>
+      <section class="card animate-fade-in">
+        <div class="card-header">
+          <h2 class="card-title">Welcome to Admin Panel</h2>
+        </div>
+        <div class="card-body">
+          <p class="meta" style="margin-bottom: 20px; font-size: 15px;">
+            Admin authentication, proxy management, and batch queue intake are working.
+            The next implementation steps are worker execution, single checks, and detailed logs.
+          </p>
+          <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <li style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--color-success-light); border-radius: var(--radius-md);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span style="font-weight: 600; color: var(--color-success);">Proxy Management</span>
+            </li>
+            <li style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--color-success-light); border-radius: var(--radius-md);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span style="font-weight: 600; color: var(--color-success);">Batch Upload</span>
+            </li>
+            <li style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--color-warning-light); border-radius: var(--radius-md);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span style="font-weight: 600; color: #b45309;">Check Logs</span>
+            </li>
+            <li style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--color-warning-light); border-radius: var(--radius-md);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span style="font-weight: 600; color: #b45309;">System Settings</span>
+            </li>
+          </ul>
+        </div>
       </section>
-    </main>
-  </body>
+    </div>
+  </main>
+</div>
+</body>
 </html>
