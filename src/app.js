@@ -68,9 +68,7 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.render('public/home', {
-    title: 'Balance Checker Pro',
-  });
+  res.redirect(301, '/check-balance');
 });
 
 app.use('/', publicCheckRoutes);
