@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %> | Check Your OpenAI Credits</title>
-    <meta name="description" content="Check your OpenAI API balance and usage quickly and securely." />
+    <meta name="theme-color" content="#00adb5" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='18' stroke='%2300ADB5' stroke-width='2' fill='none'/%3E%3Cpath d='M20 10v20M10 20h20' stroke='%2300ADB5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,12 +25,13 @@
         --bg-input-hover: rgba(255, 255, 255, 1);
         --text-primary: #222831;
         --text-secondary: rgba(34, 40, 49, 0.7);
-        --text-muted: rgba(34, 40, 49, 0.55);
+        --text-muted: rgba(34, 40, 49, 0.65);
         --border-subtle: rgba(57, 62, 70, 0.12);
         --border-input: rgba(57, 62, 70, 0.18);
         --focus-ring: rgba(0, 173, 181, 0.25);
-        --error-bg: rgba(34, 40, 49, 0.06);
-        --error-border: rgba(34, 40, 49, 0.25);
+        --error-bg: rgba(220, 38, 38, 0.08);
+        --error-border: rgba(220, 38, 38, 0.3);
+        --error-color: #dc2626;
         --success-bg: rgba(0, 173, 181, 0.08);
         --shadow-sm: 0 1px 2px rgba(34, 40, 49, 0.04);
         --shadow-md: 0 4px 12px rgba(34, 40, 49, 0.06);
@@ -246,7 +248,7 @@
         transform: translateY(-50%);
         background: none;
         border: none;
-        color: var(--text-muted);
+        color: var(--text-secondary);
         cursor: pointer;
         padding: 0.375rem;
         border-radius: var(--radius-sm);
@@ -431,7 +433,7 @@
         width: 0%;
         background: linear-gradient(90deg, var(--color-accent), #00c8d2);
         border-radius: 999px;
-        transition: width 0.3s ease;
+        transition: width 0.3s ease, background 0.3s ease;
       }
 
       .progress-text {
@@ -449,7 +451,7 @@
         background: var(--error-bg);
         border: 1px solid var(--error-border);
         border-radius: var(--radius-md);
-        color: var(--text-primary);
+        color: var(--error-color);
       }
 
       .error-icon {
@@ -460,7 +462,8 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        background: rgba(34, 40, 49, 0.12);
+        background: var(--error-color);
+        color: #ffffff;
         font-size: 0.8125rem;
         font-weight: 700;
       }
@@ -500,8 +503,18 @@
         background: #0068ff;
       }
 
+      .contact-btn.zalo:hover {
+        background: #0052cc;
+        transform: translateY(-1px);
+      }
+
       .contact-btn.telegram {
         background: #229ed9;
+      }
+
+      .contact-btn.telegram:hover {
+        background: #1a8cc7;
+        transform: translateY(-1px);
       }
 
       .footer p {
@@ -512,6 +525,100 @@
       .footer a {
         color: var(--color-accent);
         text-decoration: none;
+      }
+
+      .input-error {
+        border-color: var(--error-color) !important;
+      }
+
+      .input-error:focus {
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+      }
+
+      .inline-error {
+        display: none;
+        font-size: 0.75rem;
+        color: var(--error-color);
+        margin-top: 0.25rem;
+        animation: fadeSlideUp 0.2s ease-out;
+      }
+
+      .inline-error.visible {
+        display: block;
+      }
+
+      .result-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-subtle);
+      }
+
+      .btn-secondary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+        padding: 0.625rem 1rem;
+        background: var(--bg-input);
+        border: 1px solid var(--border-input);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .btn-secondary:hover {
+        background: var(--bg-input-hover);
+        border-color: var(--color-mid);
+      }
+
+      .btn-secondary:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--focus-ring);
+      }
+
+      .btn-secondary svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: var(--color-mid);
+        color: #ffffff;
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1000;
+      }
+
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+
+      .contact-btn:focus-visible,
+      .btn-secondary:focus-visible,
+      .toggle-btn:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      select:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
       }
 
       @media (max-width: 640px) {
@@ -568,6 +675,7 @@
               <option value="<%= server.id %>">#<%= server.id %> - <%= server.name %></option>
               <% }) %>
             </select>
+            <span id="serverError" class="inline-error">Please select a server</span>
           </div>
 
           <div class="input-group">
@@ -581,13 +689,14 @@
                 autocomplete="off"
                 required
               />
-              <button type="button" id="toggleKey" class="toggle-btn" aria-label="Toggle visibility">
+              <button type="button" id="toggleKey" class="toggle-btn" aria-label="Show key">
                 <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                   <circle cx="12" cy="12" r="3" />
                 </svg>
               </button>
             </div>
+            <span id="apiKeyError" class="inline-error">Invalid API key format. Must start with sk-</span>
           </div>
 
           <button type="submit" id="submitBtn" class="btn-primary">
@@ -623,6 +732,24 @@
             </div>
             <span class="progress-text">0% used</span>
           </div>
+
+          <div class="result-actions">
+            <button type="button" class="btn-secondary" id="copyBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copy kết quả
+            </button>
+            <button type="button" class="btn-secondary" id="checkAgainBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 4v6h-6"></path>
+                <path d="M1 20v-6h6"></path>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Check tiếp
+            </button>
+          </div>
         </div>
 
         <div id="error" class="error-box hidden">
@@ -641,6 +768,8 @@
       </footer>
     </main>
 
+    <div id="toast" class="toast">Đã copy!</div>
+
     <script>
       const form = document.getElementById('checkForm');
       const serverSelect = document.getElementById('server_id');
@@ -649,11 +778,59 @@
       const submitBtn = document.getElementById('submitBtn');
       const resultBox = document.getElementById('result');
       const errorBox = document.getElementById('error');
+      const serverError = document.getElementById('serverError');
+      const apiKeyError = document.getElementById('apiKeyError');
+      const copyBtn = document.getElementById('copyBtn');
+      const checkAgainBtn = document.getElementById('checkAgainBtn');
+      const toast = document.getElementById('toast');
+
+      const eyeIcon = `<svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>`;
+      const eyeOffIcon = `<svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+        <line x1="1" y1="1" x2="23" y2="23" />
+      </svg>`;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      }
+
+      function clearInlineErrors() {
+        serverSelect.classList.remove('input-error');
+        apiKeyInput.classList.remove('input-error');
+        serverError.classList.remove('visible');
+        apiKeyError.classList.remove('visible');
+      }
+
+      function showInlineError(input, errorEl, message) {
+        input.classList.add('input-error');
+        errorEl.textContent = message;
+        errorEl.classList.add('visible');
+      }
 
       toggleBtn.addEventListener('click', () => {
         const isPassword = apiKeyInput.type === 'password';
         apiKeyInput.type = isPassword ? 'text' : 'password';
         toggleBtn.setAttribute('aria-label', isPassword ? 'Hide key' : 'Show key');
+        toggleBtn.innerHTML = isPassword ? eyeOffIcon : eyeIcon;
+      });
+
+      serverSelect.addEventListener('change', () => {
+        if (serverSelect.value) {
+          serverSelect.classList.remove('input-error');
+          serverError.classList.remove('visible');
+        }
+      });
+
+      apiKeyInput.addEventListener('input', () => {
+        if (apiKeyInput.value.startsWith('sk-') || apiKeyInput.value === '') {
+          apiKeyInput.classList.remove('input-error');
+          apiKeyError.classList.remove('visible');
+        }
       });
 
       form.addEventListener('submit', async (event) => {
@@ -662,19 +839,24 @@
         const apiKey = apiKeyInput.value.trim();
         const serverId = serverSelect.value;
 
+        clearInlineErrors();
+
+        let hasError = false;
+
         if (!serverId) {
-          showError('Please select a server');
-          return;
+          showInlineError(serverSelect, serverError, 'Vui lòng chọn server');
+          hasError = true;
         }
 
         if (!apiKey || !apiKey.startsWith('sk-')) {
-          showError('Invalid API key format. Must start with sk-');
-          return;
+          showInlineError(apiKeyInput, apiKeyError, 'API key phải bắt đầu bằng sk-');
+          hasError = true;
         }
+
+        if (hasError) return;
 
         setLoading(true);
         hideError();
-        hideResult();
 
         try {
           const response = await fetch('/api/check', {
@@ -707,7 +889,10 @@
         submitBtn.classList.toggle('loading', loading);
       }
 
+      let currentResult = null;
+
       function showResult(payload) {
+        currentResult = payload;
         document.querySelector('.result-server').textContent = `#${payload.server_id} - ${payload.server_name}`;
         document.querySelector('.balance-value').textContent = `$${payload.balance_usd}`;
         document.querySelector('.usage-value').textContent = `$${payload.usage_usd}`;
@@ -717,14 +902,53 @@
         const usage = parseFloat(payload.usage_usd);
         const percentage = limit > 0 ? Math.min(100, (usage / limit) * 100) : 0;
 
-        document.querySelector('.progress-fill').style.width = `${percentage}%`;
-        document.querySelector('.progress-text').textContent = `${percentage.toFixed(1)}% used`;
+        const progressFill = document.querySelector('.progress-fill');
+        progressFill.style.width = `${percentage}%`;
+
+        let progressColor;
+        if (percentage >= 90) {
+          progressColor = '#dc2626';
+        } else if (percentage >= 70) {
+          progressColor = '#f59e0b';
+        } else {
+          progressColor = '#00adb5';
+        }
+        progressFill.style.background = `linear-gradient(90deg, ${progressColor}, ${progressColor}cc)`;
+
+        const progressText = document.querySelector('.progress-text');
+        progressText.textContent = `${percentage.toFixed(1)}% used`;
+        progressText.style.color = percentage >= 90 ? '#dc2626' : '';
 
         resultBox.classList.remove('hidden');
       }
 
+      copyBtn.addEventListener('click', () => {
+        if (!currentResult) return;
+        const text = `Server: #${currentResult.server_id} - ${currentResult.server_name}\nBalance: $${currentResult.balance_usd}\nUsed: $${currentResult.usage_usd}\nLimit: $${currentResult.limit_usd}`;
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Đã copy kết quả!');
+        });
+      });
+
+      checkAgainBtn.addEventListener('click', () => {
+        hideResult();
+        clearInlineErrors();
+        apiKeyInput.value = '';
+        apiKeyInput.type = 'password';
+        toggleBtn.innerHTML = eyeIcon;
+        toggleBtn.setAttribute('aria-label', 'Show key');
+        serverSelect.value = '';
+      });
+
       function hideResult() {
         resultBox.classList.add('hidden');
+        const progressFill = document.querySelector('.progress-fill');
+        progressFill.style.width = '0%';
+        progressFill.style.background = '';
+        const progressText = document.querySelector('.progress-text');
+        progressText.textContent = '0% used';
+        progressText.style.color = '';
+        currentResult = null;
       }
 
       function showError(message) {
