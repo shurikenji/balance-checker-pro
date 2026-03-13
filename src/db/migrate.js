@@ -131,8 +131,6 @@ function runMigrations(db) {
     ['per_proxy_concurrency', '1'],
     ['check_timeout_ms', '15000'],
     ['batch_retry_count', '1'],
-    ['proxy_failure_threshold', '3'],
-    ['proxy_cooldown_minutes', '10'],
   ];
 
   const insertSetting = db.prepare(`
@@ -145,6 +143,19 @@ function runMigrations(db) {
     for (const [key, value] of defaultSettings) {
       insertSetting.run(key, value);
     }
+
+    db.prepare(
+      `
+        UPDATE proxies
+        SET
+          status = 'active',
+          cooldown_until = NULL,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE status = 'cooldown'
+      `
+    ).run();
+
+    db.prepare("DELETE FROM system_settings WHERE key IN ('proxy_failure_threshold', 'proxy_cooldown_minutes')").run();
   });
 
   transaction();

@@ -1,7 +1,6 @@
 const axios = require('axios');
 
 const { getDatabase } = require('../../db');
-const { getNumericSetting } = require('../settings/service');
 
 function listProxies() {
   return getDatabase()
@@ -54,7 +53,7 @@ function getProxySummary() {
           COUNT(*) AS total,
           SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) AS active,
           SUM(CASE WHEN status = 'disabled' THEN 1 ELSE 0 END) AS disabled,
-          SUM(CASE WHEN status = 'cooldown' THEN 1 ELSE 0 END) AS cooldown
+          0 AS cooldown
         FROM proxies
       `
     )
@@ -241,23 +240,6 @@ function updateProxyStatus(id, status) {
     .run(status, id);
 }
 
-function setProxyCooldown(id) {
-  const cooldownMinutes = getNumericSetting('proxy_cooldown_minutes', 10);
-
-  getDatabase()
-    .prepare(
-      `
-        UPDATE proxies
-        SET
-          status = 'cooldown',
-          cooldown_until = datetime('now', ?),
-          updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-      `
-    )
-    .run(`+${cooldownMinutes} minutes`, id);
-}
-
 function updateProxyStatsSuccess(id, latencyMs, statusCode) {
   const db = getDatabase();
   const current = db.prepare('SELECT * FROM proxy_stats WHERE proxy_id = ?').get(id);
@@ -312,13 +294,6 @@ function updateProxyStatsFailure(id, errorMessage) {
     errorMessage,
     id
   );
-
-  const failureThreshold = getNumericSetting('proxy_failure_threshold', 3);
-  const nextFailures = Number(existing.consecutive_failures || 0) + 1;
-
-  if (nextFailures >= failureThreshold) {
-    setProxyCooldown(id);
-  }
 }
 
 async function testProxyConnectivity(id) {
@@ -372,7 +347,6 @@ module.exports = {
   getProxySummary,
   listActiveProxies,
   listProxies,
-  setProxyCooldown,
   testProxyConnectivity,
   updateProxy,
   updateProxyStatsFailure,

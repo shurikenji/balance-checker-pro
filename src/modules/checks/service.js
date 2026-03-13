@@ -52,13 +52,14 @@ async function fetchBillingData(proxy, apiKey, timeoutMs) {
     };
   } catch (error) {
     const status = error.response ? Number(error.response.status) : null;
+    const upstreamError = error.response?.data?.error || {};
     const message =
-      error.response?.data?.error?.message ||
+      upstreamError.message ||
       error.code ||
       error.message ||
       'Failed to check balance';
 
-    const normalized = normalizeUpstreamError(status, message);
+    const normalized = normalizeUpstreamError(status, message, upstreamError);
     const enriched = new Error(normalized.message);
 
     enriched.code = normalized.code;
@@ -75,21 +76,38 @@ function normalizeRateMultiplier(value) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }
 
-function normalizeUpstreamError(status, message) {
+function normalizeUpstreamError(status, message, upstreamError = {}) {
   const normalizedMessage = String(message || '').toLowerCase();
+  const upstreamCode = String(upstreamError.code || '').toLowerCase();
+  const upstreamType = String(upstreamError.type || '').toLowerCase();
+
+  if (
+    upstreamCode === 'insufficient_quota' ||
+    upstreamType === 'insufficient_quota' ||
+    normalizedMessage.includes('insufficient_quota') ||
+    normalizedMessage.includes('quota exhausted') ||
+    normalizedMessage.includes('quota exceeded') ||
+    normalizedMessage.includes('quota has been exhausted') ||
+    normalizedMessage.includes('exceeded your current quota') ||
+    normalizedMessage.includes('billing hard limit') ||
+    normalizedMessage.includes('negative balance') ||
+    normalizedMessage.includes('余额不足') ||
+    normalizedMessage.includes('额度已用尽') ||
+    normalizedMessage.includes('额度不足') ||
+    normalizedMessage.includes('é¢åº¦å·²ç”¨å°½') ||
+    normalizedMessage.includes('é¢åº¦ä¸è¶³')
+  ) {
+    return {
+      code: 'quota_exhausted',
+      message: 'Quota exhausted',
+      retryable: false,
+    };
+  }
 
   if (normalizedMessage.includes('invalid api key') || normalizedMessage.includes('incorrect api key')) {
     return {
       code: 'invalid_api_key',
       message: 'Invalid API key',
-      retryable: false,
-    };
-  }
-
-  if (normalizedMessage.includes('quota') && normalizedMessage.includes('exceeded')) {
-    return {
-      code: 'quota_exhausted',
-      message: 'Quota exhausted',
       retryable: false,
     };
   }

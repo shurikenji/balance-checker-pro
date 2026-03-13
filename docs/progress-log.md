@@ -83,7 +83,7 @@
 - filter by type, status, proxy, and limit
 
 12. Settings UI
-- edit timeout, concurrency, retry, and cooldown values from admin
+- edit timeout, concurrency, and retry values from admin
 
 13. Security hardening
 - CSRF protection for admin forms
@@ -106,6 +106,12 @@
 - passed active `page` state to all admin routes
 - moved proxy edit and batch detail to the new shared admin shell
 - removed the obsolete legacy admin nav partial
+
+17. Error normalization and proxy policy cleanup
+- removed automatic proxy cooldown from runtime policy
+- reactivated legacy `cooldown` records during migration
+- removed cooldown-related settings from admin
+- normalized `insufficient_quota` and negative-balance style upstream errors to `quota_exhausted`
 
 ### Pending
 

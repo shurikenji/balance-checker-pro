@@ -90,6 +90,10 @@ function getApiErrorStatus(code) {
     return 400;
   }
 
+  if (code === 'quota_exhausted') {
+    return 402;
+  }
+
   if (code === 'invalid_proxy') {
     return 404;
   }

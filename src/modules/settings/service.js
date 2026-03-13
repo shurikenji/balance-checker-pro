@@ -37,24 +37,6 @@ const SETTING_DEFINITIONS = [
     step: 1,
     defaultValue: '1',
   },
-  {
-    key: 'proxy_failure_threshold',
-    label: 'Proxy failure threshold',
-    description: 'Consecutive proxy failures before the system marks it as cooldown.',
-    inputType: 'number',
-    min: 1,
-    step: 1,
-    defaultValue: '3',
-  },
-  {
-    key: 'proxy_cooldown_minutes',
-    label: 'Proxy cooldown (minutes)',
-    description: 'Cooldown duration before a failed proxy becomes active again.',
-    inputType: 'number',
-    min: 1,
-    step: 1,
-    defaultValue: '10',
-  },
 ];
 
 function getSetting(key, fallbackValue = null) {

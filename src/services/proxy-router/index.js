@@ -1,36 +1,9 @@
 const { getNumericSetting } = require('../../modules/settings/service');
-const { getProxyById, listProxies, updateProxyStatus } = require('../../modules/proxies/service');
-
-function refreshExpiredCooldowns() {
-  const now = Date.now();
-
-  for (const proxy of listProxies()) {
-    if (
-      proxy.status === 'cooldown' &&
-      proxy.cooldown_until &&
-      new Date(proxy.cooldown_until).getTime() <= now
-    ) {
-      updateProxyStatus(proxy.id, 'active');
-    }
-  }
-}
+const { getProxyById, listProxies } = require('../../modules/proxies/service');
 
 function listCandidateProxies() {
-  refreshExpiredCooldowns();
-  const now = Date.now();
-
   return listProxies()
-    .filter((proxy) => {
-      if (proxy.status === 'disabled') {
-        return false;
-      }
-
-      if (proxy.status === 'cooldown' && proxy.cooldown_until) {
-        return new Date(proxy.cooldown_until).getTime() <= now;
-      }
-
-      return proxy.status === 'active';
-    })
+    .filter((proxy) => proxy.status === 'active')
     .sort((left, right) => {
       if (left.priority !== right.priority) {
         return left.priority - right.priority;
@@ -81,10 +54,6 @@ function isProxyUsable(proxy, activeProxyCounts, excluded) {
   const maxConcurrency = Math.max(1, Number(proxy.max_concurrency || getNumericSetting('per_proxy_concurrency', 1)));
 
   if (proxy.status === 'disabled') {
-    return false;
-  }
-
-  if (proxy.status === 'cooldown' && proxy.cooldown_until && new Date(proxy.cooldown_until).getTime() > Date.now()) {
     return false;
   }
 
